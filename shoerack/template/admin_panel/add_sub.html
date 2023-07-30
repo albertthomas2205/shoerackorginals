@@ -1,0 +1,31 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+
+{% block heading %} subCategory{% endblock  %}
+
+
+{% block content %}
+
+
+
+
+
+    <form method="post" action="">
+        {% csrf_token %}
+        <label for="category">Category:</label>
+        <select name="category" id="category">
+            {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="subcategory_name">Subcategory Name:</label>
+        <input type="text" name="subcategory_name" id="subcategory_name">
+        <br>
+        <input type="submit" value="Create Subcategory">
+    </form>
+
+
+
+{% endblock  %}

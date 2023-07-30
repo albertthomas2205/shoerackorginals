@@ -1,0 +1,59 @@
+{% extends 'admin_panel/base.html' %}
+
+
+{% block heading %}Category{% endblock %}
+
+{% block content %}
+
+<div class="col-md-6 d-flex align-items-stretch">
+    <div class="card w-100">
+        <div class="card-body p-4">
+            <h5 class="card-title fw-semibold mb-4">SUB CATEGORY</h5>
+            <div class="search-container">
+                <form action="" method="get">
+                    <input type="text" name="search" placeholder="Search by category name">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+            </div>
+            <div class="d-flex justify-content-end mb-3">
+                <a href="{% url 'add_category' %}" class="btn btn-primary">Add SubCategory</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table text-nowrap mb-0 align-middle">
+                    <thead class="text-dark fs-4">
+                        <tr>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Category Name</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Actions</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Actions</h6>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for category in categories %}
+                        <tr>
+                            <td>{{ category.name }}</td>
+                            <td>
+
+                                <a href="{% url 'edit' category.id %}" class="btn btn-sm btn-primary">Edit</a>
+                            </td>
+                                        <td>                   
+                                <form method="post" action= "{% url 'delete_category' category.name %}"style="display: inline;">
+                                    {% csrf_token %} 
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this category?')">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
