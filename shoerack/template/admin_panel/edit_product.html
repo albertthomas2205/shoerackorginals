@@ -1,0 +1,57 @@
+{% extends 'admin_panel/base.html' %}  
+
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 aliagn-item-center">
+<div class="container ">
+    <h2>Edit Product</h2>
+    <form method="post" action="{% url 'edit_product' product.id %}">
+        {% csrf_token %}
+        <div class="form-group ">
+            <label for="name">Product Name:</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ product.name }}">
+        </div>
+        <div class="form-group">
+            <label for="stock">Stock:</label>
+            <input type="number" class="form-control" id="stock" name="stock" value="{{ product.stock }}">
+        </div>
+        <div class="form-group">
+            <label for="color">Color:</label>
+            <input type="text" class="form-control" id="color" name="color" value="{{ product.color }}">
+        </div>
+        <div class="form-group">
+            <label for="size">Size:</label>
+            <input type="text" class="form-control" id="size" name="size" value="{{ product.size }}">
+        </div>
+        <div class="form-group">
+            <label for="price">Price:</label>
+            <input type="number" class="form-control" id="price" name="price" value="{{ product.price }}">
+        </div>
+        <div class="form-group">
+            <label for="category">Category:</label>
+            <select class="form-control" id="category" name="category">
+                {% for category in categories %}
+                <option value="{{ category.id }}" {% if product.category.id == category.id %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="subcategory">Subcategory:</label>
+            <select class="form-control" id="subcategory" name="subcategory">
+                {% for subcategory in subcategories %}
+                <option value="{{ subcategory.id }}" {% if product.subcategory.id == subcategory.id %}selected{% endif %}>
+                    {{ subcategory.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{% url 'product_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+</div>
+</div>
+{% endblock %}

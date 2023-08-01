@@ -1,0 +1,87 @@
+
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+      <!--  Header End -->
+      
+                
+                      
+                      <div class="col-md-12 mt-4 text-center">
+                          <h3 class="text-centre bg-dark text-white p-4">User details</h3>
+          
+          
+                        
+          
+                          <table class="table table-stripped" id="data-table">
+                              <thead>
+                                  <tr>
+                                      <th scope="col">sl no</th>
+                                      <th scope="col">id</th>
+                                      <th scope="col">Name</th>
+                                      <th scope="col">Email</th>
+                                      <th scope="col">Phonenumber</th>
+                                      <th scope="col">Action</th>
+                                      <!-- <th scope="col">Delete</th> -->
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  {% for d in data %}
+                                  <tr><td></td>
+                                      <th scope="row">{{d.id}}</th>
+                                      <td>{{d.name}}</td>
+                                      <td>{{d.email}}</td>
+                                      <td>{{d.phone_number}}</td>
+                                      <td>
+                                        <form method="post" action="{% url 'block' d.id %}" style="display: inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm {% if d.is_active %}btn-success{% else %}btn-primary{% endif %}">
+                                                {% if d.is_active%}Block{% else %}Unblock{% endif %}
+                                            </button>
+                                        </form>
+                                    </td>
+
+                                     
+                                  </tr>
+                                    
+                                  {% endfor %}
+                              </tbody>
+                          </table>
+          
+          
+          
+          
+                        </div>
+                          <div class="d-grid gap-2 col-md-2">
+                             
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          
+                   
+          
+          </div>
+        </div>
+      </div>
+
+      
+   
+  
+
+  
+  
+
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      var table = document.getElementById('data-table');
+      var rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+      // Add serial numbers to each row
+      for (var i = 0; i < rows.length; i++) {
+        var serialNumberCell = rows[i].getElementsByTagName('td')[0];
+        serialNumberCell.textContent = (i + 1).toString();
+      }
+    });
+  </script>
+{% endblock %}

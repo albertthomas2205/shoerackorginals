@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout,validators
 from .models import CustomUserManager
 from django.contrib.sessions.models import Session
+from adminside.models import Product,ProductImage
 
 
 # Create your views here.
@@ -90,7 +91,7 @@ def loginn(request):
     return render(request,'userside/login.html')
 
 
-def signout(request):
+def signoutt(request):
     logout(request)
     return redirect('index')
    
@@ -140,3 +141,32 @@ def loginnn(request):
 
     products = Product.objects.all()
     return render(request, 'userside/index.html', {'products': products})
+# def singleproduct(request):
+#     return render(request,'userside/singleproduct.html')
+def singleproduct(request,id):
+    data=Product.objects.get(id=id)
+    k=ProductImage.objects.filter(product=data)
+    context={'data':data,'k':k}
+    return render(request,'userside/singleproduct.html',context)
+
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail
+from django.conf import settings
+import random
+
+def forgot_password(request):
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail
+from django.conf import settings
+import random
+
+
+
+
+
