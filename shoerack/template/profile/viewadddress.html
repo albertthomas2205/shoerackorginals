@@ -1,0 +1,100 @@
+{% extends 'profile/profilebase.html' %}
+{% load static %}
+{% block content %}
+   
+
+    <div class="content">
+		<a href="{% url 'addaddress' %}" class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Add Address</span></a>
+		<section class="vh-100" style="background-color:white;">
+			
+	
+		
+			<div class="container py-5 h-50">
+				
+		
+				
+			  <div class="row d-flex justify-content-center align-items-center h-100">
+				
+				{% for address in addresses %}<div class="col col-md-9 col-lg-7 col-xl-5">
+					
+				  <div class="card" style="border-radius: 15px; background-color:white">
+					<div class="card-body p-4 text-black">
+					  <div>
+						<h6 class="mb-4">Address</h6>
+						<div class="d-flex align-items-center justify-content-between mb-3">
+							
+							<ul>
+								<strong>Name:</strong> {{ address.custom_name }} <br>
+								<strong>House Name:</strong> {{ address.house_name }} <br>
+								<strong>Landmark:</strong> {{ address.landmark }} <br>
+								<strong>Pincode:</strong> {{ address.pincode }} <br>
+								<strong>City:</strong> {{ address.city }} <br>
+								<strong>State:</strong> {{ address.state }} <br>
+								<strong>Phone:</strong> {{ address.alternative_ph }} <br><br>
+                               
+							</ul>
+					
+						</div>
+					  </div>
+					  <button type="button" class="btn btn-outline-warning"> <a href="{% url 'editaddress' address.id %}">Edit</a></button>
+					
+					  {% comment %} <button type="button" class="btn btn-outline-danger" id="deleteAddressBtn"><a href="{% url 'delete_address' address.id %}">Delete</a></button> {% endcomment %}
+                      <button type="button" class="btn btn-danger delete-address-btn" data-address-id={{ address.pk }} >Delete </button>
+
+				  </div>
+				</div>
+		
+				
+			  </div>
+			  {% endfor %}
+			</div>
+		  </section>
+
+
+          {% endblock  %}
+
+         
+
+
+
+{% block jss %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('.delete-address-btn').click(function() {
+            var addressId = $(this).data('address-id');
+            console.log(addressId);
+    
+            // Display a confirmation dialog before deletion
+            if (confirm("Are you sure you want to delete this address?")) {
+                // Perform AJAX request to delete the address
+                $.ajax({
+                    type: 'POST',  // You can use 'GET' or 'POST' based on your server setup
+                    url: '{% url "delete_address" %}' ,  // Replace with your delete address URL
+                    data: {
+                        address_id: addressId,
+                        csrfmiddlewaretoken: '{{ csrf_token }}',  // Include CSRF token for security
+                    },
+                    success: function(response) {
+                        // Handle success (e.g., remove the deleted address from the page)
+                        if (response.success) {
+                            $(this).closest('.card').remove(); // Remove the deleted address card
+                        }
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        // Handle error
+                        console.error('Error deleting address:', errorThrown);
+                    }
+                });
+            }
+        });
+    });
+    </script>
+    
+          
+{% endblock  %}
+
+
+
+

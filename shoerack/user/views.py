@@ -1,17 +1,20 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from .models import CustomUser
 from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout,validators
 from .models import CustomUserManager
 from django.contrib.sessions.models import Session
-from adminside.models import Product,ProductImage
+from adminside.models import Product,ProductImage,Category,Productsize
+from user.models import Userdetails
+from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
 def index(request):
     products = Product.objects.all()
+    category = Category.objects.all()
             
-    return render(request,'userside/index.html',{'products':products})
+    return render(request,'userside/index.html',{'products':products,'category':category})
 
 
 
@@ -38,36 +41,12 @@ def register(request):
 
                 return redirect('otp')
         
-        # else:
-        #     messages.error(request, "Invalid credentials")
-        #     return redirect('register')
+        else:
+            messages.error(request, "please check yor password")
+            return redirect('register')
     
     return render(request, 'userside/register.html')
 
-# def Registerpage(request):
-   
-#     if request.method=='POST':
-#         name= request.POST.get('name')
-#         email= request.POST.get('email')
-#         phone_number= request.POST.get('phone')
-#         pass1= request.POST.get('pass1')
-#         password= request.POST.get('pass2')
-#         if pass1!=password or pass1 is None or len(pass1)<3 :
-#             key='2'
-#             messages.error(request, f'Passwords are not matching or week. ({key})')
-#             return redirect('register')
-#         if CustomUser.objects.filter(email=email).exists():
-#             key='2'
-#             messages.error(request, f'This email address is already registered. ({key})')
-#             return redirect('register')
-#         else:
-#             custom_user_manager = CustomUserManager()
-#             custom_user_manager.send_otp_email(request,email)
-#             my_user=CustomUser.objects.create_user(name=name,email=email,phone_number=phone_number,password=password,is_verified=False)
-#             my_user.save()
-#             my_user=authenticate(request, email=email,password=password)
-#             return redirect('otpp')
-#     return render(request,'userside/register.html')
 
 
 def loginn(request):
@@ -86,7 +65,8 @@ def loginn(request):
             return redirect('otp')
         else:
             print('user is none')
-            messages.error(request, "Invalid credentials")
+            messages.error(request, "Invalid password/email")
+            return redirect('loginn')
        
     return render(request,'userside/login.html')
 
@@ -120,53 +100,116 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 
 
-def loginnn(request):
-    if request.user.is_authenticated:
-        return redirect('index')
+def product_detail_view(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
+    k=ProductImage.objects.filter(product=product)
+    context = {'product': product,'k':k}
+    return render(request, 'userside/singleproduct.html',context)
+
+from django.http import JsonResponse
+
+
+def update_price(request):
+    if request.method == 'GET':
+        product_id = request.GET.get('product')
+        selected_size = request.GET.get('size')
+        try:
+            product = Product.objects.get(pk=product_id)
+            product_size = Productsize.objects.get(product=product, size=selected_size)
+            return JsonResponse({'price': str(product_size.price)})
+        except (Product.DoesNotExist, Productsize.DoesNotExist):
+            return JsonResponse({'error': 'Product or size not found'}, status=400)
+
+
+def base(request):
+    return render(request,'userside/sigle.html')
+
+
+@login_required
+def addaddress(request):
+    user = request.user
+    # Now 'user' contains the currently logged-in user object.
+    return render(request, 'userside/address.html')
+
+def category(request,id):
+    category = get_object_or_404(Category,id=id)
+  
+    product = Product.objects.filter(category=category)
+    context = {'product':product}
+    return render(request,'userside/category.html',context)
+    
+from .models import Userdetails
+from adminside.forms import UserdetailsForm  # Create a Django form for Userdetails
+
+def shop(request):
+    shop = Product.objects.all()
+    context = {'shop':shop}
+    return render(request,'userside/category.html',context)
+
+
+
+def profilebase(request):
+    return render(request,'userside/profilebase.html')
+
+@login_required
+def user_details(request):
+    # Retrieve the logged-in user's details
+    addresses = Userdetails.objects.filter(userr=request.user)
+    print('haiiii')
+    print(addresses)
+
+    # Pass the user_details object to the HTML template
+    return render(request, 'userside/profile.html', {'addresses': addresses})
+
+
+def add_address(request):
+    if request.method == 'POST':
+        form = UserdetailsForm(request.POST)
+        if form.is_valid():
+            address = form.save(commit=False)
+            address.userr = request.user  # Assuming you have a CustomUser model and using request.user for the logged-in user
+            address.save()
+            return redirect('details')  # Replace 'address_list' with the URL name of the page displaying the list of addresses
+    else:
+        form = UserdetailsForm()
+    
+    return render(request, 'userside/address.html', {'form': form})
+
+def edit_address(request, address_id):
+    address = get_object_or_404(Userdetails, id=address_id)
 
     if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        print(email, password)
-        user = authenticate(request, email=email, password=password)
-        if user is not None:
-            print('haiiiiii')
-            custom_user_manager = CustomUserManager()
-            custom_user_manager.send_otp_email(request, email)
-            login(request, user)
-            return redirect('otp')
-        else:
-            print('user is none')
-            messages.error(request, "Invalid credentials")
+        form = UserdetailsForm(request.POST, instance=address)
+        if form.is_valid():
+            form.save()
+            return redirect('address_list')  # Replace 'address_list' with the URL name of the page displaying the list of addresses
+    else:
+        form = UserdetailsForm(instance=address)
 
-    products = Product.objects.all()
-    return render(request, 'userside/index.html', {'products': products})
-# def singleproduct(request):
-#     return render(request,'userside/singleproduct.html')
-def singleproduct(request,id):
-    data=Product.objects.get(id=id)
-    k=ProductImage.objects.filter(product=data)
-    context={'data':data,'k':k}
-    return render(request,'userside/singleproduct.html',context)
+    return render(request, 'edit_address.html', {'form': form, 'address': address})
 
-from django.contrib import messages
-from django.shortcuts import render, redirect
-from django.contrib.auth import get_user_model
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.mail import send_mail
-from django.conf import settings
-import random
+def edit_address(request, userdetails_id):
+    userdetails = get_object_or_404(Userdetails, id=userdetails_id)
 
-def forgot_password(request):
-from django.contrib import messages
-from django.shortcuts import render, redirect
-from django.contrib.auth import get_user_model
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.mail import send_mail
-from django.conf import settings
-import random
+    if request.method == 'POST':
+        form = UserdetailsForm(request.POST, instance=userdetails)
+        if form.is_valid():
+            form.save()
+            return redirect('user_addresses')  # Replace with the URL name for success
+    else:
+        form = UserdetailsForm(instance=userdetails)
 
+    context = {'form': form}
+    return render(request, 'userside/address.html', context)
 
+def delete_address(request, userdetails_id):
+    userdetails = get_object_or_404(Userdetails, id=userdetails_id)
+    
+    if request.method == 'POST':
+        userdetails.delete()
+        return redirect('user_adddresses')  # Replace with the URL name for success
+
+    return redirect('userside/profile.html', userdetails_id=userdetails_id)
 
 
 

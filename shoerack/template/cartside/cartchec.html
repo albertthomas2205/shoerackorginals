@@ -1,0 +1,122 @@
+{% comment %} 
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shopping Cart</title>
+</head>
+<body>
+    <h1>Your Shopping Cart</h1>
+    <table class="table-shopping-cart">
+        <!-- Table header -->
+        <!-- ... -->
+
+        {% for item in cart.items.all %}
+        <tr class="table_row" data-product-id="{{ item.product.id }}">
+            <td class="column-1">
+                <div class="how-itemcart1">
+                    <img src="{{ item.product.images.first.image.url }}" alt="IMG">
+                </div>
+            </td>
+            <td>{{ item.product.name }}</td>
+            <td class="column-3" id="price_{{ item.product.id }}">{{ item.product.price }}</td>
+            <td class="column-4">
+                <div class="wrap-num-product flex-w m-l-auto m-r-0">
+                    <div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m">
+                        <i class="fs-16 zmdi zmdi-minus"></i>
+                    </div>
+
+                    <input class="mtext-104 cl3 txt-center num-product" type="number" min="1" max="{{ item.product.stock }}" name="quantity" value="{{ item.quantity }}" data-product-id="{{ item.product.id }}">
+
+                    <div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
+                        <i class="fs-16 zmdi zmdi-plus"></i>
+                    </div>
+                </div>
+            </td>
+            <td class="column-5">{{ item.get_subtotal }}</td>
+            <td class="column-6">
+                <a href="{% url 'delete_cart_item' item.id %}" style="color:black">
+                    <!-- Delete button -->
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p>Total Amount: {{ total_amount }}</p>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // cart.html JavaScript code
+        const csrfToken = '{{ csrf_token }}';
+    
+        // Function to update the cart item using AJAX
+        function updateCartItem(product_id, quantity) {
+            $.ajax({
+                url: '/update_cart_item/',
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'product_id': product_id,
+                    'quantity': quantity
+                },
+                success: function(data) {
+                    if (data.success) {
+                        // Update the price
+                        const priceElement = document.getElementById(`price_${product_id}`);
+                        priceElement.innerText = data.updated_price;
+    
+                        // Update the subtotal
+                        const subtotalElement = document.getElementById(`subtotal_${product_id}`);
+                        subtotalElement.innerText = data.subtotal;
+    
+                        // Update the stock
+                        const stockElement = document.getElementById(`stock_${product_id}`);
+                        stockElement.innerText = data.updated_stock;
+    
+                        // Handle out-of-stock scenario
+                        if (data.updated_stock === 0) {
+                            // Disable "Add to Cart" button or show an appropriate message
+                        }
+                    } else {
+                        // Handle errors or display a message
+                    }
+                },
+                error: function() {
+                    // Handle errors or display a message
+                }
+            });
+        }
+    
+        // Listen for changes in the quantity input fields
+        $(document).on('change', 'input[name="quantity"]', function() {
+            const product_id = $(this).data('product-id');
+            const quantity = $(this).val();
+            updateCartItem(product_id, quantity);
+        });
+    </script>
+    
+</body>
+</html> {% endcomment %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkout</title>
+</head>
+<body>
+    <h1>Checkout</h1>
+    
+    <h2>Cart Details:</h2>
+    <ul>
+        {% for item in cart.items.all %}
+        <li>{{ item.product.name }} - {{ item.quantity }} x {{ item.product.price }}</li>
+        {% endfor %}
+    </ul>
+    
+    <h2>Total Amount: ${{ cart.get_total_amount }}</h2>
+    
+    <h2>Tax: ${{ tax_amount }}</h2>
+    
+    <h2>Shipping Fees: ${{ shipping_fees }}</h2>
+    
+    <h2>Grand Total: ${{ grand_total }}</h2>
+</body>
+</html>

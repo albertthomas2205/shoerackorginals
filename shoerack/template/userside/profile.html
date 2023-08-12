@@ -1,0 +1,76 @@
+{% extends 'userside/profilebase.html' %}
+{% load static %}
+    <!-- Main content area -->{% block content  %}
+
+    <div class="content">
+		<a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Add Address</span></a>
+		<section class="vh-100" style="background-color:white;">
+			
+	
+		
+			<div class="container py-5 h-100">
+				
+		
+				
+			  <div class="row d-flex justify-content-center align-items-center h-100">
+				
+				{% for address in addresses %}<div class="col col-md-9 col-lg-7 col-xl-5">
+					
+				  <div class="card" style="border-radius: 15px; background-color:aliceblue;">
+					<div class="card-body p-4 text-black">
+					  <div>
+						<h6 class="mb-4">Address</h6>
+						<div class="d-flex align-items-center justify-content-between mb-3">
+							
+							<ul>
+								<strong>Name:</strong> {{ address.custom_name }} <br>
+								<strong>House Name:</strong> {{ address.house_name }} <br>
+								<strong>Landmark:</strong> {{ address.landmark }} <br>
+								<strong>Pincode:</strong> {{ address.pincode }} <br>
+								<strong>City:</strong> {{ address.city }} <br>
+								<strong>State:</strong> {{ address.state }} <br>
+								<strong>Phone:</strong> {{ address.alternative_ph }} <br><br>
+							</ul>
+					
+						</div>
+					  </div>
+					  <button type="button" class="btn btn-outline-warning"> <a href="{% url 'edit_address' address.id %}">Edit</a></button>
+					  <span ></span>
+					  {% comment %} <button type="button" class="btn btn-outline-danger" id="deleteAddressBtn"><a href="{% url 'delete_address' address.id %}">Delete</a></button> {% endcomment %}
+					  <button type="button" class="btn btn-danger" id="deleteAddressBtn">Delete Address</button>
+				  </div>
+				</div>
+		
+				
+			  </div>
+			  {% endfor %}
+			</div>
+		  </section>
+		  
+To add a confirmation alert before deleting an address, you can use JavaScript along with Django's template language. Here's how you can modify your code to achieve this:
+
+Update your HTML template (edit_address.html):
+html
+Copy code
+<!-- ... your previous HTML code ... -->
+{% comment %} <div class="d-flex justify-content-center">
+    <button type="button" class="btn btn-danger" id="deleteAddressBtn">Delete Address</button>
+</div> {% endcomment %}
+
+<script>
+    const deleteBtn = document.getElementById('deleteAddressBtn');
+	console.log(deleteBtn);
+    deleteBtn.addEventListener('click', function() {
+        const confirmed = confirm('Are you sure you want to delete this address?');
+        if (confirmed) {
+            // Redirect to the delete view URL
+            window.location.href = "";
+        }
+    });
+</script>
+		  {% endblock  %}
+
+	
+
+
+

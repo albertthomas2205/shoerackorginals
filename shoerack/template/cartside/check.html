@@ -1,0 +1,177 @@
+
+{% extends 'userside/profilebase.html' %}
+
+{% load static %}
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% if user_addresses %}
+        <h2>Shipping Addresses</h2>
+        <form action="/select-address" method="post">
+            {% for address in user_addresses %}
+                <input type="radio" id="address{{ forloop.counter }}" name="selected_address" value="{{ address.id }}">
+                <label for="address{{ forloop.counter }}">
+                    <h3>Address {{ forloop.counter }}</h3>
+                    <p><strong>Name:</strong> {{ address.custom_name }}</p>
+                    <p><strong>House Name:</strong> {{ address.house_name }}</p>
+                    <p><strong>Landmark:</strong> {{ address.landmark }}</p>
+                    <p><strong>Pincode:</strong> {{ address.pincode }}</p>
+                    <p><strong>City:</strong> {{ address.city }}</p>
+                    <p><strong>State:</strong> {{ address.state }}</p>
+                    <p><strong>Alternative Phone:</strong> {{ address.alternative_ph }}</p>
+                </label>
+                <br>
+            {% endfor %}
+            <button type="submit">Select Address</button>
+        </form>
+    {% else %}
+        <p>No shipping addresses found for the current user.</p>
+    {% endif %}
+</body>
+
+</html> -->
+
+
+<!-- Your HTML code for the cart details table -->
+
+    <!-- Main content area -->
+
+    
+    {% block content  %}
+ 
+    
+    
+    <section class="login_box_area section_gap" style="min-height: 0; padding-bottom: 0;">
+        <div class="container  justify-content-center" >
+            <div class="row">
+                <div class="col-lg-6">
+                    <!-- Address Form -->
+                    <div class="card mt-4">
+                        <div class="card-body">
+                            <h5 class="card-title text-center" > <strong>Add New Address</strong></h5>
+                            <!DOCTYPE html>
+                            <html>
+                            <head>
+                                <title>Add Address</title>
+                            </head>
+                          
+                                <form method="post" action="{% url 'add_address' %}">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label for="{{ form.custom_name.id_for_label }}" class="form-label">Name</label>
+                                        <input type="text" class="form-control" id="{{ form.custom_name.id_for_label }}" name="custom_name" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="{{ form.house_name.id_for_label }}" class="form-label">House Name</label>
+                                        <input type="text" class="form-control" id="{{ form.house_name.id_for_label }}" name="house_name">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="{{ form.landmark.id_for_label }}" class="form-label">Landmark</label>
+                                        <input type="text" class="form-control" id="{{ form.landmark.id_for_label }}" name="landmark">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="{{ form.pincode.id_for_label }}" class="form-label">Pincode</label>
+                                        <input type="text" class="form-control" id="{{ form.pincode.id_for_label }}" name="pincode" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="{{ form.city.id_for_label }}" class="form-label">City</label>
+                                        <input type="text" class="form-control" id="{{ form.city.id_for_label }}" name="city" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="{{ form.state.id_for_label }}" class="form-label">State</label>
+                                        <input type="text" class="form-control" id="{{ form.state.id_for_label }}" name="state" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="{{ form.alternative_ph.id_for_label }}" class="form-label">Phone</label>
+                                        <input type="tel" class="form-control" id="{{ form.alternative_ph.id_for_label }}" name="alternative_ph">
+                                    </div>
+                                    <div class="d-flex justify-content-center">
+                                        <button type="submit" class="btn btn-primary">Add Address</button>
+                                    </div>
+                                </form>
+                           
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <!-- Your other content (e.g., registration form) goes here -->
+                    <!-- ... Your other content ... -->
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <style>
+        /* Custom CSS to modify for wide devices */
+        @media (min-width: 992px) {
+            .login_box_area {
+                min-height: 100vh;
+            }
+        }
+    </style>
+    
+    
+    
+{% endblock %} 
+{% comment %} 
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shopping Cart</title>
+</head>
+<body>
+    <h1>Your Shopping Cart</h1>
+    <table class="table-shopping-cart">
+        <tr class="table_head">
+            <th class="column-1">Product</th>
+            <th class="column-2"></th>
+            <th class="column-3">Price</th>
+            <th class="column-4">Quantity</th>
+            <th class="column-5">Total</th>
+            <th class="column-6">Delete</th>
+        </tr>
+
+        {% for item in cart.items.all %}
+        <tr class="table_row">
+            <td class="column-1">
+                <div class="how-itemcart1">
+                    <img src="{{ item.product.product.images.first.image.url }}" alt="IMG">
+                </div>
+            </td>
+            <td class="{{ item.product.product.name }}"></td>
+            <td class="column-3">{{ item.product.price }}</td>
+            <td class="column-4">
+                <div class="wrap-num-product flex-w m-l-auto m-r-0">
+                    <div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m">
+                        <i class="fs-16 zmdi zmdi-minus"></i>
+                    </div>
+
+                    <input class="mtext-104 cl3 txt-center num-product" type="number" max="{{ item.product.stock }}" name="num-product1" value="{{ item.quantity }}"> 
+
+                    <div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
+                        <i class="fs-16 zmdi zmdi-plus"></i>
+                    </div>
+                </div>
+            </td>
+            <td class="column-5">{{ item.get_subtotal }}</td>
+            <td class="column-6">
+                <a href="{% url 'delete_cart_item' item.id %}" style="color:black">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
+                        <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
+                    </svg>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p>Total Amount: {{ total_amount }}</p>
+</body>
+</html> {% endcomment %}

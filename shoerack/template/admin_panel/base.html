@@ -1,4 +1,5 @@
 {% load static %}
+
 <!doctype html>
 <html lang="en">
 
@@ -8,7 +9,10 @@
   <title>ShoeRack</title>
   <link rel="shortcut icon" type="image/png" href="{% static 'static_admin/assets/images/logos/lgg.png' %}" />
   <link rel="stylesheet" href="{% static 'static_admin/assets/css/styles.min.css' %}" />
+  {% block js %}{% endblock %}
+  {% block css %}{% endblock %}
 </head>
+
 
 <body>
   <!--  Body Wrapper -->
@@ -42,8 +46,8 @@
               </a>
             </li>
             <li class="nav-small-cap">
-              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">User Mangement</span>
+              <i class="ti ti-dots nav-small-cap-icon"></i>
+              <span class="hide-menu">Mangement</span>
             </li>
             <li class="sidebar-item">
               <a class="sidebar-link" href="{% url 'user' %}" aria-expanded="false">
@@ -53,59 +57,35 @@
                 <span class="hide-menu">Customer Details</span>
               </a>
             </li>
-        
-            <li class="nav-small-cap">
-              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">CATEGORY MANAGEMENT</span>
-            </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'category' %}" aria-expanded="false">
+              <a class="sidebar-link" href="{% url 'category' %}" aria-expanded="">
                 <span>
-                  <i class="ti ti-article"></i>
+                  <i class="ti ti-user-plus"></i>
                 </span>
                 <span class="hide-menu">Category</span>
               </a>
             </li>
+          
+           
+
             <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'sub' %}" aria-expanded="false">
-                <span>
-                  <i class="ti ti-article"></i>
-                </span>
-                <span class="hide-menu">Subcategory</span>
-              </a>
-            </li>
-            <li class="nav-small-cap">
-              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">CATEGORY MANAGEMENT</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'user' %}" aria-expanded="false">
-                <span>
-                  <i class="ti ti-article"></i>
-                </span>
-                <span class="hide-menu">userdetails</span>
-              </a>
-            </li>
-            <li class="nav-small-cap">
-              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">PRODUT MANAGEMENT</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'product_list' %}" aria-expanded="false">
+              <a class="sidebar-link" href="{% url 'product' %}" aria-expanded="false">
                 <span>
                   <i class="ti ti-cards"></i>
                 </span>
-                <span class="hide-menu">Product List</span>
+                <span class="hide-menu">Product </span>
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'add_product' %}" aria-expanded="false">
+              <a class="sidebar-link" href="{% url 'ordermanagement' %}" aria-expanded="false">
                 <span>
                   <i class="ti ti-cards"></i>
                 </span>
-                <span class="hide-menu">Add Product </span>
+                <span class="hide-menu">Order </span>
               </a>
             </li>
+            
+            
           </ul>
          
         </nav>
@@ -166,10 +146,10 @@
       <div class="container-fluid">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title fw-semibold mb-4"> {% block heading %}Sampl page{% endblock  %}</h5>
-            <p class="mb-0"> {% block subheading %}user details{% endblock  %} </p>
+            <h5 class="card-title fw-semibold mb-4"> {% block heading %}{% endblock  %}</h5>
+            <p class="mb-0"> {% block subheading %}{% endblock  %} </p>
             <br>
-            {% block content %}content{% endblock  %}
+            {% block content %}{% endblock  %}
             <div class="container mt-3">
               <div class="row">
                 

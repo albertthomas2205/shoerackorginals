@@ -1,0 +1,121 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body> -->
+    <!-- <h1>{{ product.name }}</h1>
+    <p>Color: {{ product.color }}</p>
+    <p>Category: {{ product.category }}</p>
+    <p>Brand: {{ product.brand }}</p>
+  
+    <label for="sizeSelect">Select Size:</label>
+    <select id="sizeSelect">
+      {% for size in product.productsize.all %}
+        <option value="{{ size.size }}">{{ size.size }}</option>
+      {% endfor %}
+    </select>
+  
+    <p>Price: $<span id="priceDisplay">{{ product.productsize.first.price }}</span></p>
+
+      -->
+
+<!--       
+     <h1>{{ product.name }}</h1>
+<p>Color: {{ product.color }}</p>
+<p>Category: {{ product.category }}</p>
+<p>Brand: {{ product.brand }}</p>
+
+<div class="size-204 respon6-next">
+    <div class="rs1-select2 bor8 bg0">
+        <select class="js-select2" name="sizeSelect" id="sizeSelect">
+            <option>Choose an option</option>
+            {% for size in product.productsize.all %}
+                <option>{{ size.size }}</option>
+            {% endfor %}
+        </select>
+        <div class="dropDownSelect2"></div>
+    </div>
+</div>
+
+<p>Price: $<span id="priceDisplay">{{ product.productsize.first.price }}</span></p>
+  
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        const sizeSelect = document.getElementById('sizeSelect');
+        const priceDisplay = document.getElementById('priceDisplay');
+        const productId = "{{ product.id }}";  // Assuming you have the product ID available
+  
+        sizeSelect.addEventListener('change', () => {
+          const selectedSize = sizeSelect.value;
+  
+          // Make an AJAX request to update the price
+          $.ajax({
+            url: `/update_price/?product=${productId}&size=${selectedSize}`,
+            success: function(data) {
+              priceDisplay.textContent = data.price;
+            }
+          });
+        });
+      });
+    </script>
+  
+</body>
+</html> 
+
+ -->
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Cart</title>
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ </head>
+ <body>
+     <h1>Your Cart</h1>
+     <div id="cart-items">
+         {% for item in cart_items %}
+             <div class="cart-item">
+                 <h3>{{ item.product.name }}</h3>
+                 <p>Available Quantity: {{ item.product.available_quantity }}</p>
+                 <input class="quantity-input" type="number" min="1" value="{{ item.quantity }}" data-item-id="{{ item.id }}">
+                 <p>Subtotal: $<span id="subtotal_{{ item.id }}">{{ item.get_subtotal }}</span></p>
+             </div>
+         {% endfor %}
+     </div>
+     <p>Total Amount: $<span id="total_amount">{{ total_amount }}</span></p>
+     
+     <script>
+     $(document).ready(function() {
+         $('.quantity-input').on('input', function() {
+             var item_id = $(this).data('item-id');
+             var new_quantity = $(this).val();
+             
+             $.ajax({
+                 type: 'POST',
+                 url:  "update_quantity/" ,  // Replace with the correct URL
+                 data: {
+                     'item_id': item_id,
+                     'new_quantity': new_quantity,
+                     'csrfmiddlewaretoken': '{{ csrf_token }}'
+                 },
+                 success: function(data) {
+                     if (data.error) {
+                         alert(data.error);
+                     } else {
+                         $('#subtotal_' + item_id).text(data.subtotal);
+                         $('#total_amount').text(data.total_amount);
+                     }
+                 }
+             });
+         });
+     });
+     </script>
+ </body>
+ </html>
+  

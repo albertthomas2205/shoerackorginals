@@ -1,6 +1,28 @@
 
 {% extends 'admin_panel/base.html' %}
 {% load static %}
+{% block js %}
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      var blockForm = document.getElementById("blockForm");
+      var blockButton = document.getElementById("blockButton");
+
+      blockForm.addEventListener("submit", function(event) {
+          var action = {% if d.is_active %}'Block'{% else %}'Unblock'{% endif %};
+          var confirmationMessage = (action === 'Block') ?
+              'Are you sure you want to proceed?' :
+              'Are you sure you want to proceed?';
+
+          if (!confirm(confirmationMessage)) {
+              event.preventDefault(); // Prevent form submission if user cancels
+          }
+      });
+  });
+</script>
+
+
+{% endblock  %}
 
 {% block content %}
       <!--  Header End -->
@@ -33,12 +55,21 @@
                                       <td>{{d.email}}</td>
                                       <td>{{d.phone_number}}</td>
                                       <td>
-                                        <form method="post" action="{% url 'block' d.id %}" style="display: inline;">
+                                        {% comment %} <form method="post" action="{% url 'block' d.id %}" style="display: inline;">
                                             {% csrf_token %}
                                             <button type="submit" class="btn btn-sm {% if d.is_active %}btn-success{% else %}btn-primary{% endif %}">
                                                 {% if d.is_active%}Block{% else %}Unblock{% endif %}
                                             </button>
-                                        </form>
+                                        </form> {% endcomment %}
+
+                                        <form id="blockForm" method="post" action="{% url 'block' d.id %}" style="display: inline;">
+                                          {% csrf_token %}
+                                          <button type="submit" id="blockButton" class="btn btn-sm {% if d.is_active %}btn-success{% else %}btn-primary{% endif %}">
+                                              {% if d.is_active %}Block{% else %}Unblock{% endif %}
+                                          </button>
+                                      </form>
+                                      
+                                      
                                     </td>
 
                                      

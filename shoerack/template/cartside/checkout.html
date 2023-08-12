@@ -1,0 +1,540 @@
+{% extends 'userside/core.html' %}
+{% load static %}
+{% block sample %}
+<style>
+    body{margin-top:20px;
+        background-color: #f1f3f7;
+        }
+        
+        .card {
+            margin-bottom: 24px;
+            -webkit-box-shadow: 0 2px 3px #e4e8f0;
+            box-shadow: 0 2px 3px #e4e8f0;
+        }
+        .card {
+            position: relative;
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            min-width: 0;
+            word-wrap: break-word;
+            background-color: #fff;
+            background-clip: border-box;
+            border: 1px solid #eff0f2;
+            border-radius: 1rem;
+        }
+        .activity-checkout {
+            list-style: none
+        }
+        
+        .activity-checkout .checkout-icon {
+            position: absolute;
+            top: -4px;
+            left: -24px
+        }
+        
+        .activity-checkout .checkout-item {
+            position: relative;
+            padding-bottom: 24px;
+            padding-left: 35px;
+            border-left: 2px solid #f5f6f8
+        }
+        
+        .activity-checkout .checkout-item:first-child {
+            border-color: #3b76e1
+        }
+        
+        .activity-checkout .checkout-item:first-child:after {
+            background-color: #3b76e1
+        }
+        
+        .activity-checkout .checkout-item:last-child {
+            border-color: transparent
+        }
+        
+        .activity-checkout .checkout-item.crypto-activity {
+            margin-left: 50px
+        }
+        
+        .activity-checkout .checkout-item .crypto-date {
+            position: absolute;
+            top: 3px;
+            left: -65px
+        }
+        
+        
+        
+        .avatar-xs {
+            height: 1rem;
+            width: 1rem
+        }
+        
+        .avatar-sm {
+            height: 2rem;
+            width: 2rem
+        }
+        
+        .avatar {
+            height: 3rem;
+            width: 3rem
+        }
+        
+        .avatar-md {
+            height: 4rem;
+            width: 4rem
+        }
+        
+        .avatar-lg {
+            height: 5rem;
+            width: 5rem
+        }
+        
+        .avatar-xl {
+            height: 6rem;
+            width: 6rem
+        }
+        
+        .avatar-title {
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            background-color: #3b76e1;
+            color: #fff;
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            font-weight: 500;
+            height: 100%;
+            -webkit-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            width: 100%
+        }
+        
+        .avatar-group {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+            padding-left: 8px
+        }
+        
+        .avatar-group .avatar-group-item {
+            margin-left: -8px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            -webkit-transition: all .2s;
+            transition: all .2s
+        }
+        
+        .avatar-group .avatar-group-item:hover {
+            position: relative;
+            -webkit-transform: translateY(-2px);
+            transform: translateY(-2px)
+        }
+        
+        .card-radio {
+            background-color: #fff;
+            border: 2px solid #eff0f2;
+            border-radius: .75rem;
+            padding: .5rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block
+        }
+        
+        .card-radio:hover {
+            cursor: pointer
+        }
+        
+        .card-radio-label {
+            display: block
+        }
+        
+        .edit-btn {
+            width: 35px;
+            height: 35px;
+            line-height: 40px;
+            text-align: center;
+            position: absolute;
+            right: 25px;
+            margin-top: -50px
+        }
+        
+        .card-radio-input {
+            display: none
+        }
+        
+        .card-radio-input:checked+.card-radio {
+            border-color: #3b76e1!important
+        }
+        
+        
+        .font-size-16 {
+            font-size: 16px!important;
+        }
+        .text-truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        a {
+            text-decoration: none!important;
+        }
+        
+        
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: 0.47rem 0.75rem;
+            font-size: .875rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #545965;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #e2e5e8;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            border-radius: 0.75rem;
+            -webkit-transition: border-color .15s ease-in-out,-webkit-box-shadow .15s ease-in-out;
+            transition: border-color .15s ease-in-out,-webkit-box-shadow .15s ease-in-out;
+            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out,-webkit-box-shadow .15s ease-in-out;
+        }
+        
+        .edit-btn {
+            width: 35px;
+            height: 35px;
+            line-height: 40px;
+            text-align: center;
+            position: absolute;
+            right: 25px;
+            margin-top: -50px;
+        }
+        
+        .ribbon {
+            position: absolute;
+            right: -26px;
+            top: 20px;
+            -webkit-transform: rotate(45deg);
+            transform: rotate(45deg);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 1px 22px;
+            font-size: 13px;
+            font-weight: 500
+        }
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/5.3.45/css/materialdesignicons.css" integrity="sha256-NAxhqDvtY0l4xn+YVa6WjAcmd94NNfttjNsDmNatFVc=" crossorigin="anonymous" />
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+<br><br><br><br>
+
+{% endblock  %}
+
+{% block search %}
+
+
+
+
+
+{% endblock  %}
+<br><br>
+{% block content %}
+<div class="container">
+
+    <div class="row">
+        <div class="col-xl-6 mt-5">
+
+            <div class="card">
+                <div class="card-body">
+                    <ol class="activity-checkout mb-0 px-4 mt-3">
+                        <li class="checkout-item">
+                            <div class="avatar checkout-icon p-1">
+                                <div class="avatar-title rounded-circle bg-primary">
+                                    <i class="bx bxs-receipt text-white font-size-20"></i>
+                                </div>
+                            </div>
+                            <div class="feed-item-list">
+                                <div>
+                                    <h5 class="font-size-16 mb-1">Billing Info</h5>
+                                    <p class="text-muted text-truncate mb-4">Create Newaddress</p>
+                                    <div class="mb-3">
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="checkout-item">
+                            <div class="avatar checkout-icon p-1">
+                                <div class="avatar-title rounded-circle bg-primary">
+                                    <i class="bx bxs-truck text-white font-size-20"></i>
+                                </div>
+                            </div>
+                            <div class="feed-item-list">
+                                <form action="createorder" method="post">
+                                    {% csrf_token %}
+                                <div>
+                                   
+                                    <h5 class="font-size-16 mb-1">Shipping Info</h5>
+                                    <p class="text-muted text-truncate mb-4">Select ypur address</p>
+                                    <div class="mb-3">
+                                       
+                                        <div class="row">
+                                            {% if addresses %}
+                                            {% for add in addresses %}
+                                            {% if forloop.counter <= 2 %}
+                                           
+                                            <div class="col-lg-6 col-sm-6">
+                                                <div data-bs-toggle="collapse">
+                                                    <label class="card-radio-label mb-0">
+                                                        <input type="radio" name="address" id="info-address1" class="card-radio-input" checked="" value="{{add.id}}">
+                                                        <div class="card-radio text-truncate p-3">
+                                                            <span class="fs-14 mb-4 d-block">Address {{ forloop.counter }}</span>
+                                                            <span class="fs-14 mb-2 d-block">{{add.custom_name}}</span>
+                                                            <span class="text-muted fw-normal text-wrap mb-1 d-block">{{add.house_name}}</span>
+                                                            <span class="text-muted fw-normal text-wrap mb-1 d-block">{{add.landmark}},{{add.city}}</span>
+                                                            <span class="text-muted fw-normal text-wrap mb-1 d-block">{{add.state}},{{add.pincode}}</span>
+                                                           
+                                                            <span class="text-muted fw-normal d-block">{{add.alernative_ph}}</span>
+                                                        </div>
+                                                    </label>
+                                                    <div class="edit-btn bg-light  rounded">
+                                                        <a href="#" data-bs-toggle="tooltip" data-placement="top" title="" data-bs-original-title="Edit">
+                                                            <i class="bx bx-pencil font-size-16"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                            {% endfor %}{% else %}
+                                            <a href="{% url 'address' %}" style="color: white; font-weight: 400; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;"
+                                             type="button" class="btn btn-success">Add address</a>
+
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="checkout-item">
+                            <div class="avatar checkout-icon p-1">
+                                <div class="avatar-title rounded-circle bg-primary">
+                                    <i class="bx bxs-wallet-alt text-white font-size-20"></i>
+                                </div>
+                            </div>
+                            <div class="feed-item-list">
+                                <div>
+                                    <h5 class="font-size-16 mb-1">Payment Info</h5>
+                                    <p class="text-muted text-truncate mb-4">Select the paymwnt method</p>
+                                </div>
+                                <div>
+                                    <h5 class="font-size-14 mb-3">Payment method :</h5>
+                                    <div class="row">
+                                        <div class="col-lg-3 col-sm-6">
+                                            <div data-bs-toggle="collapse">
+                                                <label class="card-radio-label">
+                                                    <input type="radio" name="pay-method" id="pay-methodoption1" class="card-radio-input" value="Card">
+                                                    <span class="card-radio py-3 text-center text-truncate">
+                                                        <i class="bx bx-credit-card d-block h2 mb-3"></i>
+                                                        Credit / Debit Card
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-lg-3 col-sm-6">
+                                            <div>
+                                                <label class="card-radio-label">
+                                                    <input type="radio" name="pay-method" id="pay-methodoption2" class="card-radio-input" value="Upi">
+                                                    <span class="card-radio py-3 text-center text-truncate">
+                                                        <i class="bx bxl-paypal d-block h2 mb-3"></i>
+                                                        Upi
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-3 col-sm-6">
+                                            <div>
+                                                <label class="card-radio-label">
+                                                    <input type="radio" name="pay-method" id="pay-methodoption3" class="card-radio-input" checked="" value="Cash on Delivery">
+
+                                                    <span class="card-radio py-3 text-center text-truncate">
+                                                        <i class="bx bx-money d-block h2 mb-3"></i>
+                                                        <span>Cash on Delivery</span>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="row my-4">
+                <div class="col">
+                    <a href="ecommerce-products.html" class="btn btn-link text-muted">
+                        <i class="mdi mdi-arrow-left me-1"></i> Continue Shopping </a>
+                </div> <!-- end col -->
+                 <!-- end col -->
+            </div> <!-- end row-->
+        </div>
+        <div class="col-xl-5 m-5">
+            <div class="card checkout-order-summary">
+                <div class="card-body">
+                    <div class="p-3 bg-light mb-3">
+                        <h5 class="font-size-16 mb-0">Order Summary <span class="float-end ms-2"></span></h5>
+                    </div>
+                    <div class=" bg-light rounded rounded-pill shadow-sm mb-3">
+                        <!-- <label for="button" style="color: black;">Apply coupon</label> -->
+                        <div class="input-group">
+                            <input type="search" placeholder="Apply coupon" aria-describedby="button-addon1" class="form-control border-0 bg-light font-size-5">
+                            <div class="input-group-append" style="color: rgb(60, 57, 57);">
+                                <button id="" type="submit" class="btn " >apply</button>
+                            </div>
+                            <div class="input-group-append" style="color: darkblue;">
+                                <button id="" type="button" data-toggle="modal" data-target="#exampleModal-4" class="btn" >view coupons</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-centered mb-0 table-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="border-top-0" style="width: 110px;" scope="col">Product</th>
+                                    <th class="border-top-0" scope="col">Product Desc</th>
+                                    <th class="border-top-0" scope="col">Price</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for cartitem in cart_items %}
+                                <tr>
+                                    <th scope="row"><img src="{{cartitem.product.product.images.first.image.url}}" alt="product-img" title="product-img" class="avatar-lg rounded"></th>
+                                    <td>
+                                        <h5 class="font-size-16 text-truncate"><a href="#" class="text-dark">{{cartitem.product.product.name}}</a></h5>
+                                        <p class="text-muted mb-0">
+                                            <i class="bx bxs-star text-warning"></i>
+                                            <i class="bx bxs-star text-warning"></i>
+                                            <i class="bx bxs-star text-warning"></i>
+                                            <i class="bx bxs-star text-warning"></i>
+                                            <i class="bx bxs-star-half text-warning"></i>
+                                        </p>
+                                        <p class="text-muted mb-0 mt-1">{{cartitem.product.price}} x {{cartitem.quantity}}</p>
+                                    </td>
+                                    <td>
+                                        {{cartitem.get_subtotal}}
+                                       </td>
+
+                                </tr>
+                                    <td colspan="2">
+                                        <h6 class="font-size-14 m-0">Discount :</h6>
+                                    </td>
+                                    <td>
+                                   
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                <tr>
+                                    <td colspan="2">
+                                        <h6 class="font-size-14 m-0">Shipping Charge :</h6>
+                                    </td>
+                                    <td>
+                                      {{shipping_charges}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <h6 class="font-size-14 m-0">Estimated Tax :</h6>
+                                    </td>
+                                    <td>
+                                     {{estimated_tax}}
+                                    </td>
+                                </tr>                              
+                                    
+                                <tr class="bg-light">
+                                    <td colspan="2">
+                                        <h5 class="font-size-14 m-0">Total:</h5>
+                                    </td>
+                                    <td>
+                                        {{ final_total }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                    </div>
+                </div>
+            </div>
+            {% if addresses %}
+            <div class="col">
+                <div class="text-end mt-2 mt-sm-0">
+                    <a href="{% url 'createorder' %}"><button class="btn btn-success">Place order</button> </a>
+                </div>
+            </div>{% else %}
+            <h6 style="color: red;">Add address to checkout</h6>
+            {% endif %}
+        </form>
+        </div>
+    </div>
+    <!-- end row -->
+    <div class="page-content page-container" id="page-content">
+        <div class="padding">
+            <div class="row container d-flex justify-content-center">
+    
+    <div class="modal fade" id="exampleModal-4" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true" style="display: none;">
+                        <div class="modal-dialog" role="document" style="width: 50%;">
+                          <div class="modal-content">
+                           
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+
+
+
+                         
+                         
+                                    <div class="col-lg-6 col-md-6 col-12 ">
+                                        <div class="card border-0 bg-light rounded shadow">
+                                            <div class="card-body ">
+                                                <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">Full time</span>
+                                                <h5>Web Designer</h5>
+                                                <div class="mt-3">
+                                                    <span class="text-muted d-block"><i class="fa fa-home" aria-hidden="true"></i> <a href="#" target="_blank" class="text-muted">Bootdey.com LLC.</a></span>
+                                                    <span class="text-muted d-block"><i class="fa fa-map-marker" aria-hidden="true"></i> USA</span>
+                                                </div>
+                                                
+                                                <div class="">
+                                                    <a href="#" class="" style="color: green;">View Details</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div><!--end col-->
+                              
+                        
+                          
+                      
+                        </div>
+                      </div>
+                       </div>
+                        </div>
+                      </div>
+    
+{% endblock  %}
+{% block loadmore %}{% endblock  %}
+{% block footer %} {% endblock  %}

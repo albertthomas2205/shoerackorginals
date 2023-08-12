@@ -16,8 +16,6 @@ class CustomUser(AbstractBaseUser):
     is_admin = models.BooleanField(default = False)
     date_joined = models.DateTimeField(default=timezone.now)
 
-    # Add any additional fields you want to store for the user, like name, date of birth, etc.
-
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
@@ -26,4 +24,14 @@ class CustomUser(AbstractBaseUser):
 
     def __str__(self):
         return self.email
+    
+class Userdetails(models.Model):
+    userr = models.ForeignKey(CustomUser,on_delete = models.CASCADE)
+    custom_name = models.CharField(max_length = 50)
+    house_name = models.CharField(max_length = 30)
+    landmark = models.CharField(max_length=50)
+    pincode = models.IntegerField()
+    city = models.CharField(max_length = 40)
+    state = models.CharField(max_length = 50)
+    alternative_ph = models.CharField(max_length= 50)
 

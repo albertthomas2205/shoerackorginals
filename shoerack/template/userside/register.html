@@ -57,7 +57,20 @@
        -->
  <h3>ShoeRack</h3>
 
-       <form action="register" method="POST">
+  <h6>Register Here</h6>
+  {% if messages %}
+          <div class="alert alert-danger">
+              <ul>
+              {% for message in messages %}
+                  <li>{{ message }}</li>
+              {% endfor %}
+              </ul>
+          </div>
+        {% endif %}
+
+
+
+       <form action="" method="POST">
         {% csrf_token %}
 
         <!-- {%for message in messages%}

@@ -37,18 +37,4 @@ class CustomUserManager(BaseUserManager):
 
         return otp
         
-    # def send_otp_emailll(self, request, email):
-    #     otp = str(random.randint(100000, 999999))  # Generate a random 6-digit OTP
-    #     message = f'Your OTP for verification: {otp}'
-    #     request.session['gmail'] = email
-    #     request.session['otp'] = otp
-
-    #     send_mail(
-    #         'OTP Verification',
-    #         message,
-    #         'shoerack2205@gmail.com',  # Sender's email address
-    #         [email],  # Recipient's email address
-    #         fail_silently=False,
-    #     )
-
-    #     return otp
+ 
