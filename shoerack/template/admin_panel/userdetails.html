@@ -28,61 +28,77 @@
       <!--  Header End -->
       
                 
-                      
-                      <div class="col-md-12 mt-4 text-center">
-                          <h3 class="text-centre bg-dark text-white p-4">User details</h3>
-          
-          
-                        
-          
-                          <table class="table table-stripped" id="data-table">
-                              <thead>
-                                  <tr>
-                                      <th scope="col">sl no</th>
-                                      <th scope="col">id</th>
-                                      <th scope="col">Name</th>
-                                      <th scope="col">Email</th>
-                                      <th scope="col">Phonenumber</th>
-                                      <th scope="col">Action</th>
-                                      <!-- <th scope="col">Delete</th> -->
-                                  </tr>
-                              </thead>
-                              <tbody>
-                                  {% for d in data %}
-                                  <tr><td></td>
-                                      <th scope="row">{{d.id}}</th>
-                                      <td>{{d.name}}</td>
-                                      <td>{{d.email}}</td>
-                                      <td>{{d.phone_number}}</td>
-                                      <td>
-                                        {% comment %} <form method="post" action="{% url 'block' d.id %}" style="display: inline;">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-sm {% if d.is_active %}btn-success{% else %}btn-primary{% endif %}">
-                                                {% if d.is_active%}Block{% else %}Unblock{% endif %}
-                                            </button>
-                                        </form> {% endcomment %}
-
-                                        <form id="blockForm" method="post" action="{% url 'block' d.id %}" style="display: inline;">
-                                          {% csrf_token %}
-                                          <button type="submit" id="blockButton" class="btn btn-sm {% if d.is_active %}btn-success{% else %}btn-primary{% endif %}">
-                                              {% if d.is_active %}Block{% else %}Unblock{% endif %}
-                                          </button>
-                                      </form>
-                                      
-                                      
-                                    </td>
-
-                                     
-                                  </tr>
-                                    
-                                  {% endfor %}
-                              </tbody>
-                          </table>
-          
-          
-          
-          
-                        </div>
+      <div class="col-md-12 mt-4 text-center">
+        <h3 class="text-centre bg-dark text-white p-4">User details</h3>
+    
+        <table class="table table-stripped" id="data-table">
+            <thead>
+                <tr>
+                    <th scope="col">sl no</th>
+                    <th scope="col">id</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Phonenumber</th>
+                    <th scope="col">Action</th>
+                    <!-- <th scope="col">Delete</th> -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in data %}
+                <tr><td></td>
+                    <th scope="row">{{ d.id }}</th>
+                    <td>{{ d.name }}</td>
+                    <td>{{ d.email }}</td>
+                    <td>{{ d.phone_number }}</td>
+                    <td>
+                        <form id="blockForm" method="post" action="{% url 'block' d.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" id="blockButton" class="btn btn-sm {% if d.is_active %}btn-success{% else %}btn-primary{% endif %}">
+                                {% if d.is_active %}Block{% else %}Unblock{% endif %}
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    
+        <!-- Display pagination links using Bootstrap styles -->
+        <div class="pagination justify-content-center">
+            <ul class="pagination">
+                <!-- Previous link -->
+                {% if data.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ data.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+    
+                <!-- Page numbers -->
+                {% for page in data.paginator.page_range %}
+                    <li class="page-item {% if data.number == page %}active{% endif %}">
+                        <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+                    </li>
+                {% endfor %}
+    
+                <!-- Next link -->
+                {% if data.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ data.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+    
+    
+    
+    
+    
+    
                           <div class="d-grid gap-2 col-md-2">
                              
                           </div>

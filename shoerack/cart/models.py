@@ -58,3 +58,10 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.product.name} - {self.quantity}"
+    
+class Wishlist(models.Model):
+    userr = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    product = models.ForeignKey(Productsize, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.userr)

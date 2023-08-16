@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path,os
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-^$-g%t@-*rid4z5vt)w3y2s!ewcvs79(&2hvw788*^@%yfj#_&'
+SECRET_KEY = os.environ.get('SECRET_KEY') 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -41,6 +45,7 @@ INSTALLED_APPS = [
     'user','cart',
     "debug_toolbar",
     'account',
+    'rest_framework',
    
 ]
 
@@ -88,9 +93,9 @@ WSGI_APPLICATION = 'shoerack.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'shoeracknew',
-        'USER': 'postgres',
-        'PASSWORD': 'albert',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD':os.environ.get('DB_PASS'),
         'HOST': 'localhost',   # Or your database host
         'PORT': '5432',            # Leave empty to use the default port (usually 5432)
     }

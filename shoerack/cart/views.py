@@ -7,9 +7,10 @@ from adminside.models import Product,Productsize
 from django.contrib.auth.decorators import login_required
 # from django.views.decorators.http import require_POST
 from user.models import Userdetails,CustomUser
-from .models import Cart, CartItem
+from .models import Cart, CartItem,Wishlist
 from django.http import JsonResponse
 
+@login_required(login_url='loginn')
 def add_to_cart(request, product_id):
     # Get the product using the product_id from the request
     product = Productsize.objects.get(pk=product_id)
@@ -38,8 +39,9 @@ from .models import Productsize, Cart, CartItem,Order,OrderItem
 
 
 
+@login_required(login_url='loginn')  # Redirect to 'loginn' if not logged in
 def show_cart(request):
-    user = request.user  # Assuming you have implemented authentication and you are using the request.user to get the current user
+    user = request.user
     user_cart = Cart.objects.get(user=user)
     total_amount = user_cart.get_total_amount()
 
@@ -53,6 +55,7 @@ def show_cart(request):
 
 
 from decimal import Decimal
+
 
 def checkout(request):
     addresses = Userdetails.objects.filter(userr=request.user)
@@ -81,7 +84,9 @@ def checkout(request):
         'estimated_tax': estimated_tax,
         'final_total': final_total,
     }
+    
     return render(request, 'cartside/checkout.html', context)
+
 
 
 
@@ -212,3 +217,23 @@ def Usercancel(request,id):
     edit.status='C'
     edit.save()
     return redirect('userorders')
+
+def wishlist(request):
+    user = request.user
+    wproducts = Wishlist.objects.filter(userr=user)
+    context = {"wproducts": wproducts}
+    return render(request, "cartside/wishlist.html", context)
+
+
+def Addwishlist(request, id):
+    user = request.user
+    product = Productsize.objects.get(id=id)
+    Wishlist.objects.create(userr=user, product=product)
+    return redirect("singproduct", id)
+
+
+def Deletewishlist(request, id):
+    d = Wishlist.objects.get(id=id)
+    d.delete()
+    return redirect("wishlist")
+

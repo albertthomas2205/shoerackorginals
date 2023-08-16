@@ -6,11 +6,11 @@
   <div class="row d-flex justify-content-center align-items-center">
     <div class="col-lg-10 col-xl-8">
       <div class="card" >
-        {% if orders %}
+        {% if page_orders %}
         <div class="card-header px-3 py-5">
             <h5 class="text-muted mb-0">Thanks for your Order, <span style="color:black;"> {{cust.name}}</span>!</h5>
           </div>
-        {% for order in orders %}
+        {% for order in page_orders %}
         <div class="card-body ">
           
          
@@ -182,10 +182,42 @@
             paid: <span class="h2 mb-0 ms-2">$1040</span></h5>
         </div> {% endcomment %}
 
+
+      <div class="pagination justify-content-center">
+        <ul class="pagination">
+          <!-- Previous link -->
+          {% if  page_orders.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{  page_orders.previous_page_number }}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+          {% endif %}
+      
+          <!-- Page numbers -->
+          {% for page in  page_orders.paginator.page_range %}
+            <li class="page-item {% if  page_orders.number == page %}active{% endif %}">
+              <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+            </li>
+          {% endfor %}
+      
+          <!-- Next link -->
+          {% if  page_orders.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_orders.next_page_number }}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+      
         
       </div>
+     
     </div>
   </div>
+ 
 </div>
 </section>
 

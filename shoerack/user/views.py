@@ -1,20 +1,28 @@
 from django.shortcuts import render,redirect,get_object_or_404
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import CustomUser
 from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout,validators
 from .models import CustomUserManager
 from django.contrib.sessions.models import Session
-from adminside.models import Product,ProductImage,Category,Productsize
+from adminside.models import Product,ProductImage,Category,Productsize,Brand
 from user.models import Userdetails
 from django.contrib.auth.decorators import login_required
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .helpers import send_otp_phone
+from .models import CustomUser
+from cart.models import CartItem
 
 
 # Create your views here.
 def index(request):
     products = Product.objects.all()
     category = Category.objects.all()
+    count = CartItem.objects.all().count()
+
             
-    return render(request,'userside/index.html',{'products':products,'category':category})
+    return render(request,'userside/index.html',{'products':products,'category':category,'cart_item_count':count})
 
 
 
@@ -71,6 +79,8 @@ def loginn(request):
     return render(request,'userside/login.html')
 
 
+
+
 def signoutt(request):
     logout(request)
     return redirect('index')
@@ -102,8 +112,9 @@ from django.contrib import messages
 
 def product_detail_view(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
+    products = Product.objects.filter(id = product_id)
     k=ProductImage.objects.filter(product=product)
-    context = {'product': product,'k':k}
+    context = {'product': product,'k':k,'products':products}
     return render(request, 'userside/singleproduct.html',context)
 
 from django.http import JsonResponse
@@ -131,25 +142,74 @@ def addaddress(request):
     # Now 'user' contains the currently logged-in user object.
     return render(request, 'userside/address.html')
 
-def category(request,id):
+def category2(request,id):
     category = get_object_or_404(Category,id=id)
   
     product = Product.objects.filter(category=category)
-    context = {'product':product}
+    name = category.category_name
+    
+    context = {'product':product,'category':name}
     return render(request,'userside/category.html',context)
+
+def category(request, id):
+    category = get_object_or_404(Category, id=id)
+    products = Product.objects.filter(category=category)
+    name = category.category_name
+    
+    # Set the number of products per page
+    products_per_page = 4 # You can adjust this number as needed
+
+    paginator = Paginator(products, products_per_page)
+    page_number = request.GET.get('page')
+
+    try:
+        paginated_products = paginator.page(page_number)
+    except PageNotAnInteger:
+        paginated_products = paginator.page(1)
+    except EmptyPage:
+        paginated_products = paginator.page(paginator.num_pages)
+
+    context = {
+        'category': name,
+        'paginated_products': paginated_products,
+    }
+    return render(request, 'userside/category.html', context)
+
     
 from .models import Userdetails
 from adminside.forms import UserdetailsForm  # Create a Django form for Userdetails
 
+# def shop(request):
+#     shop = Product.objects.all()
+#     name = 'Shop'
+#     context = {'shop':shop,'category':name}
+#     return render(request,'userside/category2.html',context)
+
 def shop(request):
-    shop = Product.objects.all()
-    context = {'shop':shop}
-    return render(request,'userside/category.html',context)
+    products = Product.objects.all()
+    name = 'Shop'
+    
+    # Set the number of products per page
+    products_per_page = 1  # You can adjust this number as needed
+
+    paginator = Paginator(products, products_per_page)
+    page_number = request.GET.get('page')
+
+    try:
+        paginated_products = paginator.page(page_number)
+    except PageNotAnInteger:
+        paginated_products = paginator.page(1)
+    except EmptyPage:
+        paginated_products = paginator.page(paginator.num_pages)
+
+    context = {
+        'paginated_products': paginated_products,
+        'category': name,
+    }
+    return render(request, 'userside/category.html', context)
 
 
 
-def profilebase(request):
-    return render(request,'userside/profilebase.html')
 
 @login_required
 def user_details(request):
@@ -210,6 +270,89 @@ def delete_address(request, userdetails_id):
         return redirect('user_adddresses')  # Replace with the URL name for success
 
     return redirect('userside/profile.html', userdetails_id=userdetails_id)
+
+
+
+def search(request):
+    if request.method == 'POST':
+        result = request.POST.get('search')
+        result1 = request.POST.get('search')
+        result2 = request.POST.get('search')
+        try:
+            product = Product.objects.filter(name__icontains=result)
+            brand = Brand.objects.filter(brand_name__icontains= result1)
+            
+            category = Category.objects.filter(category_name__istartswith=result2)
+        except:
+             product = []
+             brand = []
+             category = []
+            
+             # Handle any other exceptions that might occur
+          
+        return render(request, 'userside/search.html', {'product':product,'brand':brand,'category':category} )
+    return render(request, 'userside/search.html', {})
+
+@api_view(['POST'])
+def send_otp(request):
+    data = request.data
+    
+    if data.get('phone_number') is None:
+        return Response({
+            'status':400,
+            'message': 'Key phone number is required'
+        })
+    if data.get('password') is None:
+        return Response({
+            'status':400,
+            'message':'key phone_number is required'
+        })
+    user  = CustomUser.objects.create(
+        phone_number = data.get('phone_number'),
+        otp = send_otp_phone(data.get('phone_number'))
+        )
+    user.set_password = data.get('set_password')
+    user.save()
+    
+    return Response({
+        'status':200,
+        'message': 'Otp sent'
+        
+    })
+    
+@api_view(['POST'])
+def verify_otp(request):
+    data = request.data
+    
+    if data.get('phone_number') is None:
+        return Response({
+            'status':400,
+            'message': 'Key phone number is required'
+        })
+    if data.get('otp') is None:
+        return Response({
+            'status':400,
+            'message':'key otp is required'
+        })
+    try :
+        user_obj = CustomUser.objects.get(phone_number =data.get('phone_number'))
+    
+    except Exception as e:
+        return Response({
+            'status':400,
+            'message':'invalid phone'
+        })
+    if user_obj.otp == data.get('otp'):
+        return Response({
+            'status':200,
+            'message': 'otp matched'
+        })
+    return Response({
+        'status':400,
+        'message': 'invalid otp'
+    })
+    
+
 
 
 

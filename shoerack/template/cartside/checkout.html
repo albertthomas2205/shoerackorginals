@@ -3,7 +3,7 @@
 {% block sample %}
 <style>
     body{margin-top:20px;
-        background-color: #f1f3f7;
+        background-color: white;
         }
         
         .card {
@@ -248,8 +248,9 @@
 
 
 {% endblock  %}
-<br><br>
+
 {% block content %}
+<br><br><br><br><br>
 <div class="container">
 
     <div class="row">
@@ -308,6 +309,7 @@
                                                             <span class="text-muted fw-normal d-block">{{add.alernative_ph}}</span>
                                                         </div>
                                                     </label>
+                                                    
                                                     <div class="edit-btn bg-light  rounded">
                                                         <a href="#" data-bs-toggle="tooltip" data-placement="top" title="" data-bs-original-title="Edit">
                                                             <i class="bx bx-pencil font-size-16"></i>
@@ -317,11 +319,14 @@
                                             </div>
                                             {% endif %}
                                             {% endfor %}{% else %}
-                                            <a href="{% url 'address' %}" style="color: white; font-weight: 400; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;"
+                                            <a href="{% url 'viewaddress' %}" style="color: white; font-weight: 400; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;"
                                              type="button" class="btn btn-success">Add address</a>
 
                                             {% endif %}
+                                            
                                         </div>
+                                        <br><br>
+                                        <a href="{% url 'addaddress' %}" class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Add Address</span></a>
                                     </div>
                                 </div>
                             </div>
@@ -505,10 +510,6 @@
                               </button>
                             </div>
 
-
-
-                         
-                         
                                     <div class="col-lg-6 col-md-6 col-12 ">
                                         <div class="card border-0 bg-light rounded shadow">
                                             <div class="card-body ">
@@ -526,8 +527,6 @@
                                         </div>
                                     </div><!--end col-->
                               
-                        
-                          
                       
                         </div>
                       </div>

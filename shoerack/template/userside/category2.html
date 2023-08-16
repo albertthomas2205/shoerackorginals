@@ -4,6 +4,10 @@
 
 
 
+
+
+
+
 {% block   search %}
 	<!-- Product -->
 	<section class="bg0 p-t-23 p-b-140">
@@ -233,92 +237,94 @@
 
 	{% endblock  %}
 
-  {% block content %}
-				
-<div class="row isotope-grid">
-	
-				
-    {% for p in  paginated_products %}
-	<a href="{% url 'product_detail' p.id%}">
-   
-    <div class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item women">
-	
-		
-	
-        <!-- Block2 -->
-        <div class="block2">
-            <div class="block2-pic hov-img0">
-                <img src="{{ p.images.first.image.url }}" alt="IMG-PRODUCT">
+  
+{% block content %}
 
-                {% comment %} <a href="#" class="block2-btn flex-c-m stext-103 cl2 size-102 bg0 bor2 hov-btn1 p-lr-15 trans-04 js-show-modal1">
-                    Quick View
-                </a> {% endcomment %}
+
+    <div class="row isotope-grid">
+        
+                {% for p in paginated_products %}
+                <div class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item women">
+                    <div class="block2">
+                <div class="block2-pic hov-img0">
+                    <img src="{{ p.images.first.image.url }}" alt="IMG-PRODUCT">
+                </div>
+
+                <div class="block2-txt flex-w flex-t p-t-14">
+                    <div class="block2-txt-child1 flex-col-l">
+                        <h5>{{ p.name }}</h5>
+                        <span class="stext-105 cl3">
+                            ${{ p.productsize.first.price }}
+                        </span>
+                        <span class="stext-105 cl3">
+                            {{ p.subcategory.name }}
+                        </span>
+                        <span class="stext-105 cl3">
+                            color: {{ p.color }}
+                        </span>
+                    </div>
+
+                    <div class="block2-txt-child2 flex-r p-t-3">
+                        <a href="#" class="btn-addwish-b2 dis-block pos-relative js-addwish-b2">
+                            <img class="icon-heart1 dis-block trans-04" src="{% static 'static_user/images/icons/icon-heart-01.png' %}" alt="ICON">
+                            <img class="icon-heart2 dis-block trans-04 ab-t-l" src="{% static 'static_user/images/icons/icon-heart-02.png' %}" alt="ICON">
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
 
-            <div class="block2-txt flex-w flex-t p-t-14">
-                <div class="block2-txt-child1 flex-col-l ">
-                    <h5>{{p.name}}</h5>
-                    <span class="stext-105 cl3">
-                        ${{p.productsize.first.price}}
-                    </span>
-                    <span class="stext-105 cl3">
-                         {{p.subcategory.name}}
-                    </span>
-                    <span class="stext-105 cl3">
-                        color:{{p.color}}
-                    </span>
-                    
+            <!-- Pagination links -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if paginated_products.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1" aria-label="First">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ paginated_products.previous_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item disabled">
+                        <span class="page-link">Page {{ paginated_products.number }} of {{ paginated_products.paginator.num_pages }}</span>
+                    </li>
+
+                    {% if paginated_products.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ paginated_products.next_page_number }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ paginated_products.paginator.num_pages }}" aria-label="Last">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+
+
+
+				
 
 
                 
-                    
-                </div>
 
-                <div class="block2-txt-child2 flex-r p-t-3">
-                    <a href="#" class="btn-addwish-b2 dis-block pos-relative js-addwish-b2">
-                        <img class="icon-heart1 dis-block trans-04" src="{% static 'static_user/images/icons/icon-heart-01.png' %}" alt="ICON">
-                        <img class="icon-heart2 dis-block trans-04 ab-t-l" src="{% static 'static_user/images/icons/icon-heart-02.png' %}" alt="ICON">
-                    </a>
-                </div>
-            </div>
-			{% endfor %}
-		</a>
-        </div>
-		
-    </div>
+                
 
-    
-</div>
-<div class="pagination justify-content-center">
-	<ul class="pagination">
-		<!-- Previous link -->
-		{% if  paginated_products.has_previous %}
-			<li class="page-item">
-				<a class="page-link" href="?page={{  paginated_products.previous_page_number }}" aria-label="Previous">
-					<span aria-hidden="true">&laquo;</span>
-				</a>
-			</li>
-		{% endif %}
 
-		<!-- Page numbers -->
-		{% for page in  paginated_products.paginator.page_range %}
-			<li class="page-item {% if  paginated_products.number == page %}active{% endif %}">
-				<a class="page-link" href="?page={{ page }}">{{ page }}</a>
-			</li>
-		{% endfor %}
 
-		<!-- Next link -->
-		{% if  paginated_products.has_next %}
-			<li class="page-item">
-				<a class="page-link" href="?page={{  paginated_products.next_page_number }}" aria-label="Next">
-					<span aria-hidden="true">&raquo;</span>
-				</a>
-			</li>
-		{% endif %}
-	</ul>
-</div>
 
-<div>
-                      
+
+        
 
 {% endblock  %}

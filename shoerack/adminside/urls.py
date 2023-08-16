@@ -17,6 +17,7 @@ urlpatterns = [
     # path('delete_brand/<int:brand_id>/', views.delete_brand, name='delete_brand'),
     # path('sub/',views.sub,name='sub'),
     path('add_product/',views.add_product,name= 'add_product'),
+    path('edit_productsize/<int:id>/size/<int:size_id>/', views.productsize, name='edit_productsize'),
     # path('edit_product/<int:product_id>/', views.edit_product, name='edit_product'),
     # path('delete_product/<int:product_id>/', views.delete_product, name='delete_product'), 
     path('product_list/', views.product_list, name='product_list'),
@@ -27,6 +28,8 @@ urlpatterns = [
     path('deletecategory/<int:category_id>/', views.delete_category, name='delete_category'),
     path('ordermanagement/',views.Orders,name='ordermanagement'),
     path('update_order_status/<int:id>/',views.update_order_status,name='update_order_status'),
+    path('delete_product_size/<int:id>/', views.delete_product_size, name='delete_product_size'),
+    path('editvarient/<int:id>/',views.editproductsize,name='editvarient')
 
 
 ]

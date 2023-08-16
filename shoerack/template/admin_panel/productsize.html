@@ -260,6 +260,10 @@
             }
         });
     });
+
+    function confirmDelete() {
+        return confirm('Are you sure you want to delete this product size?');
+    }
     </script>
 {% endblock  %}
 {% block content %}<div class="table-responsive">
@@ -271,7 +275,7 @@
                 </div>
                 <div class="col-sm-6">
                     <a href="#addEmployeeModal" class="btn btn-secondary" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Add variants</span></a>
-                    <a href="#deleteEmployeeModal" class="btn btn-info" data-toggle="modal"><i class="material-icons">&#xE15C;</i> <span>Delete</span></a>						
+						
                 </div>
             </div>
         </div>
@@ -291,30 +295,59 @@
                     <th>Size</th>
                     <th>Stock</th>
                     <th>Price(INR)</th>
+                    <th>Edit</th>
                     <th>Delete</th>
                 </tr>
             </thead>
             <tbody>
-                {% for k in var %}
+                {% for product_size in var %}
                 <tr>
                     <td>
                         <span class="custom-checkbox">
-                            <input type="checkbox" id="checkbox1" name="options[]" value="1">
-                            <label for="checkbox1"></label>
+                            <input type="checkbox" id="checkbox{{ product_size.id }}" name="options[]" value="{{ product_size.id }}">
+                            <label for="checkbox{{ product_size.id }}"></label>
                         </span>
                     </td>
-                    <td>{{k.id}}</td>
-                    <td>{{k.product.name}}</td>
-                    <td>{{k.description}}</td>
-                    <td>{{k.size}}</td>
-                    <td>{{k.stock}}</td>
-                    <td>{{k.price}}</td>
-                        <td> <div class="button-div"> <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
+                    <td>{{ product_size.id }}</td>
+                    <td>{{ product_size.product.name }}</td>
+                    <td>{{ product_size.description }}</td>
+                    <td>{{ product_size.size }}</td>
+                    <td>{{ product_size.stock }}</td>
+                    <td>{{ product_size.price }}</td>
+                    <td>
+                        <a href="{% url 'editvarient' id=product_size.id %}" class="edit" >
+                            <i class="material-icons" title="Edit">&#xE254;</i>
+                        </a>
                     </td>
-                </tr>{% endfor %}
-                
+                    <td>
+                        <div class="button-div">
+                            
+                                <i class="material-icons"  title="Delete"  data-bs-toggle="modal" data-bs-target="#exampleModal{{product_size.id}}">&#xE872;</i>
+                        
+                            <div class="modal fade" id="exampleModal{{product_size.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h5 class="modal-title" id="exampleModalLabel">Alert Message</h5>
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                      <P>are you want to delete this !</P>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                      <a href="{% url 'delete_product_size' id=product_size.id %}"><button type="button" class="btn btn-primary">Delete</button></a>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
+        
         {% else %}<h6 style="color: red;">Add some variations</h6>{% endif %}
     </div>
 </div>        
@@ -366,28 +399,32 @@
 <div id="editEmployeeModal" class="modal fade">
 <div class="modal-dialog">
     <div class="modal-content">
-        <form>
+        <form method="post">
+            {% csrf_token %}
             <div class="modal-header">						
-                <h4 class="modal-title">Edit Employee</h4>
+                <h4 class="modal-title">Edit Variations</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             </div>
             <div class="modal-body">					
                 <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" class="form-control" required>
+                    <label>Description</label>
+                    <input type="text" class="form-control" name="description" value="{{ product_size.description }}" required>
                 </div>
                 <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" class="form-control" required>
+                    <label>Size</label>
+                    <input type="text" class="form-control" name="size" value="{{ product_size.size }}" required>
                 </div>
                 <div class="form-group">
-                    <label>Address</label>
-                    <textarea class="form-control" required></textarea>
+                    <label>Stock</label>
+                    <input type="number" class="form-control" name="stock" value="{{ product_size.stock }}" required>
                 </div>
                 <div class="form-group">
-                    <label>Phone</label>
-                    <input type="text" class="form-control" required>
-                </div>					
+                    <label>Price</label>
+                    <input type="number" step="0.01" class="form-control" name="price" value="{{ product_size.price }}" required>
+                </div>
+                {% if product_size %}
+                    <input type="hidden" name="size_id" value="{{ product_size.id }}">
+                {% endif %}
             </div>
             <div class="modal-footer">
                 <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">

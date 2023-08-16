@@ -16,11 +16,31 @@ from cart.models import Order
 def signinn(request):
     return render(request,'account/signin.html')
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+
 def user(request):
     data = CustomUser.objects.all()
-    context={"data":data}
-    return render(request,'admin_panel/userdetails.html',context)
     
+    # Set the number of users per page
+    users_per_page = 2 # You can adjust this number as needed
+
+    paginator = Paginator(data, users_per_page)
+    page_number = request.GET.get('page')
+
+    try:
+        paginated_data = paginator.page(page_number)
+    except PageNotAnInteger:
+        paginated_data = paginator.page(1)
+    except EmptyPage:
+        paginated_data = paginator.page(paginator.num_pages)
+
+    context = {
+        'data': paginated_data,
+    }
+    
+    return render(request, 'admin_panel/userdetails.html', context)
+
 
 def signin(request):
 
@@ -39,6 +59,7 @@ def signin(request):
 
     
 def adminhome(request):
+    
     return render(request,'admin_panel/index.html')
 
 
@@ -61,14 +82,36 @@ def block_user_view(request,id):
 def base(request):
     return render(request,'admin_panel/base.html')
 
+# def product(request):
+#     products = Product.objects.all()
+#     category = Category.objects.all()
+#     brand = Brand.objects.all()
+   
+        
+#     return render(request,'admin_panel/product.html',{'products':products,'category':category,'brand':brand})
+
+
 def product(request):
     products = Product.objects.all()
     category = Category.objects.all()
     brand = Brand.objects.all()
-   
-        
-    return render(request,'admin_panel/product.html',{'products':products,'category':category,'brand':brand})
 
+    # Number of items to display per page
+    items_per_page = 5# You can adjust this number as needed
+
+    paginator = Paginator(products, items_per_page)
+
+    # Get the current page number from the request's GET parameters
+    page_number = request.GET.get('page')
+
+    # Get the Page object for the requested page number
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'admin_panel/product.html', {
+        'products': page_obj,
+        'category': category,
+        'brand': brand,
+    })
 def signout(request):
     logout(request)
     return redirect('signin')
@@ -152,11 +195,6 @@ def add_product(request):
     })
 
 
-# # views.py
-
-# from django.shortcuts import render
-# from .models import Product
-
 def productsize(request,id):
     product= get_object_or_404(Product,id=id)
     var = Productsize.objects.filter(product = product)
@@ -172,6 +210,38 @@ def productsize(request,id):
         return redirect('productsize',id) 
     
     return render(request,'admin_panel/productsize.html',context)
+
+
+def editproductsize(request, id):
+    product_size = get_object_or_404(Productsize, id=id)
+    
+    if request.method == 'POST':
+        description = request.POST.get('description')
+        size = request.POST.get('size')
+        stock = request.POST.get('stock')
+        price = request.POST.get('price')
+        
+        # Update the product size details
+        product_size.description = description
+        product_size.size = size
+        product_size.stock = stock
+        product_size.price = price
+        product_size.save()
+        
+        return redirect('productsize', id=product_size.product.id)
+    
+    context = {'product_size': product_size}
+    return render(request, 'admin_panel/varientedit.html', context)
+
+
+
+def delete_product_size(request, id):
+    product_size = get_object_or_404(Productsize, id=id)
+    k = product_size.product.id
+    product_size.delete()
+    messages.success(request, 'Product size deleted successfully.')
+    return redirect('productsize', id=k)
+
   
 
 def product_list(request):
