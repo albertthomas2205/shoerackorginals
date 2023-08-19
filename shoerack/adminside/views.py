@@ -10,6 +10,9 @@ from django.shortcuts import render, redirect
 from .models import Category
 from .forms import ProductForm, ProductImageForm,Productsize,ProductsizeForm
 from cart.models import Order
+from decimal import Decimal
+from datetime import datetime
+from django.db.models import Q
 
 
 
@@ -82,13 +85,7 @@ def block_user_view(request,id):
 def base(request):
     return render(request,'admin_panel/base.html')
 
-# def product(request):
-#     products = Product.objects.all()
-#     category = Category.objects.all()
-#     brand = Brand.objects.all()
-   
-        
-#     return render(request,'admin_panel/product.html',{'products':products,'category':category,'brand':brand})
+
 
 
 def product(request):
@@ -283,10 +280,28 @@ def delete_category(request, category_id):
     # Render the template for confirming category deletion
     return render(request, 'admin_panel/category.html',contex)
 
+def delete_product (request, id):
+    product = get_object_or_404(Product,id = id)
+    if request.method == 'POST':
+            
+        product.delete()
+        return redirect('product')
+    
+
+
 def Orders(request):
-    ords=Order.objects.all()
-    context={'ords':ords}
-    return render(request,'admin_panel/ordermanagement.html',context)
+    
+    all_orders = Order.objects.all()
+    per_page = 3
+    paginator = Paginator(all_orders, per_page)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'page_obj': page_obj,
+    }
+
+    return render(request, 'admin_panel/ordermanagement.html', context)
+
 def update_order_status(request,id):
     if request.method=='POST':
         st=request.POST.get('status')
@@ -294,5 +309,35 @@ def update_order_status(request,id):
         edit.status=st
         edit.save()
         return redirect('ordermanagement')
+    
+from datetime import datetime
+from django.shortcuts import render, redirect
+from cart.models import Coupon
+
+
+def Admincoupon(request):
+    if request.method == "POST":
+        code = request.POST.get("code")
+        discount = request.POST.get("discount")
+        minamount = request.POST.get("minamount")
+        valid_from_str = request.POST.get("from")
+        valid_to_str = request.POST.get("to")
+        valid_from = datetime.strptime(valid_from_str, "%m/%d/%Y").strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+        valid_to = datetime.strptime(valid_to_str, "%m/%d/%Y").strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+        Coupon.objects.create(
+            code=code,
+            minimumamount=minamount,
+            discount=discount,
+            valid_from=valid_from,
+            valid_to=valid_to,
+        )
+        return redirect("admincoupon")
+    datas = Coupon.objects.all()
+    return render(request, "admin_panel/coupons.html", {"datas": datas})
+
 
 

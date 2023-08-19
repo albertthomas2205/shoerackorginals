@@ -56,7 +56,7 @@
         <div class="col-md-10">
             <div class="rounded">
                 <div class="table-responsive table-borderless">
-                  {% if ords %}
+                  {% if page_obj %}
                     <table class="table">
                         <thead>
                             <tr>
@@ -70,7 +70,7 @@
                             </tr>
                         </thead>
                         <tbody class="table-body">
-                            {% for ord in ords %}
+                            {% for ord in page_obj %}
                             <tr class="cell-1" data-toggle="collapse" data-target="#{{ord.id}}" style="border-top: #000; background-color: rgba(169, 169, 169, 0.442);">
                                 <td class="text-center">1</td>
                                 <td>{{ord.id}}</td>
@@ -143,7 +143,7 @@
                                 <tr >
                                 <td class="" colspan="0.5"><i class=""></i></td>
                                 <td colspan="0.5">{{item.product.product.name}}</td>
-                                <td colspan="0.5">{{item.product.color}}</td>
+                                <td colspan="0.5">{{item.product.product.color}}</td>
                                 <td colspan="0.5">{{item.quantity}}</td>
                                 <td colspan="0.5">{{item.total_itemprice}}</td></tr>
                                 {% endfor %}
@@ -153,7 +153,25 @@
                             {% endfor %}
                            
                         </tbody>
-                    </table>{% else %}
+                    </table>
+                    <div class="pagination">
+                      <span class="step-links">
+                          {% if page_obj.has_previous %}
+                              <a href="?page=1">&laquo; first</a>
+                              <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+                          {% endif %}
+                          
+                          <span class="current-page">
+                              Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                          </span>
+                          
+                          {% if page_obj.has_next %}
+                              <a href="?page={{ page_obj.next_page_number }}">next</a>
+                              <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                          {% endif %}
+                      </span>
+                  </div>
+                    {% else %}
                     No orders
 
 

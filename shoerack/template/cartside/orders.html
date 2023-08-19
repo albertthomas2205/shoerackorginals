@@ -34,18 +34,23 @@
                   <img src="{{item.product.product.images.first.image.url }}"
                     class="img-fluid" alt="Phone">
                 </div>
-                <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                <!-- <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
                   <p class="text-muted mb-0"> {{item.product.product.name}} </p>
-                </div>
+                </div> -->
                 <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
-                  <p class="text-muted mb-0 small">{{item.product.color}} </p>
+                  <p class="text-muted mb-0 small">{{item.product.product.color}} </p>
                 </div>
                 <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
                   <p class="text-muted mb-0 small">{{order.get_status_display}}</p>
                 </div>
+               
                 <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
                   <p class="text-muted mb-0 small">{{item.quantity}}</p>
                 </div>
+                <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                  <p class="text-muted mb-0 small">{{item.quantity}}</p>
+                </div>
+               
                 <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
                   <p class="text-muted mb-0 small">₹{{item.total_itemprice}}</p>
                 </div>
@@ -60,6 +65,9 @@
                 <div class="col-md-2">
                     <p class="text-muted mb-0 small">Track Order</p>
                   </div>
+                  <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                    <p class="text-muted mb-0 small">COD</p>
+                  </div>
                 <div class="col-md-10">
                   <div class="progress" style="height: 6px; border-radius: 16px;">
                     <div class="progress-bar" role="progressbar"
@@ -73,7 +81,7 @@
                 </div>
                 <div class="d-flex justify-content-between pt-2">
                     <p class="fw-bold mb-0">Order Details</p>
-                    <p class="text-muted mb-0"><span class="fw-bold me-4">Total</span>₹{{order.total_price}}</p>
+                    <p class="text-muted mb-0"><span class="fw-bold me-4"></span>{{orders.total_price}}</p>
                   </div>
       
                   <!-- <div class="d-flex justify-content-between pt-2">
@@ -108,7 +116,7 @@
                 </div>
                 <div class="d-flex justify-content-between pt-2">
                     <p class="fw-bold mb-0">Order Details</p>
-                    <p class="text-muted mb-0"><span class="fw-bold me-4">Total</span>₹{{order.total_price}}</p>
+                    <p class="text-muted mb-0"><span class="fw-bold me-4"></span>{{order.first.total_price}}</p>
                   </div>
 <!--           
                   <div class="d-flex justify-content-between pt-2">
@@ -142,7 +150,7 @@
                 </div>
                 <div class="d-flex justify-content-between pt-2">
                     <p class="fw-bold mb-0">Order Details</p>
-                    <p class="text-muted mb-0"><span class="fw-bold me-4">Total</span>₹{{order.total_price}}</p>
+                    <p class="text-muted mb-0"><span class="fw-bold me-4"></span>{{order.first.total_itemprice}}</p>
                   </div>
       
                   <!-- <div class="d-flex justify-content-between pt-2">

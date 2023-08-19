@@ -110,12 +110,27 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 
 
+# def product_detail_view(request, product_id):
+#     product = get_object_or_404(Product, pk=product_id)
+#     relatedproducts = Product.objects.filter(id = product_id)
+#     k=ProductImage.objects.filter(product=product)
+#     context = {'product': product,'k':k,'products':relatedproducts}
+#     return render(request, 'userside/singleproduct.html',context)
+
 def product_detail_view(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
-    products = Product.objects.filter(id = product_id)
-    k=ProductImage.objects.filter(product=product)
-    context = {'product': product,'k':k,'products':products}
-    return render(request, 'userside/singleproduct.html',context)
+    
+    # Get the brand of the current product
+    current_brand = product.brand
+    
+    # Filter related products by brand and exclude the current product
+    relatedproducts = Product.objects.filter(brand=current_brand).exclude(pk=product_id)
+    
+    # Retrieve product images
+    k = ProductImage.objects.filter(product=product)
+    
+    context = {'product': product, 'k': k, 'products': relatedproducts}
+    return render(request, 'userside/singleproduct.html', context)
 
 from django.http import JsonResponse
 
@@ -142,14 +157,7 @@ def addaddress(request):
     # Now 'user' contains the currently logged-in user object.
     return render(request, 'userside/address.html')
 
-def category2(request,id):
-    category = get_object_or_404(Category,id=id)
-  
-    product = Product.objects.filter(category=category)
-    name = category.category_name
-    
-    context = {'product':product,'category':name}
-    return render(request,'userside/category.html',context)
+
 
 def category(request, id):
     category = get_object_or_404(Category, id=id)
@@ -179,18 +187,12 @@ def category(request, id):
 from .models import Userdetails
 from adminside.forms import UserdetailsForm  # Create a Django form for Userdetails
 
-# def shop(request):
-#     shop = Product.objects.all()
-#     name = 'Shop'
-#     context = {'shop':shop,'category':name}
-#     return render(request,'userside/category2.html',context)
-
 def shop(request):
     products = Product.objects.all()
     name = 'Shop'
     
     # Set the number of products per page
-    products_per_page = 1  # You can adjust this number as needed
+    products_per_page = 4  # You can adjust this number as needed
 
     paginator = Paginator(products, products_per_page)
     page_number = request.GET.get('page')

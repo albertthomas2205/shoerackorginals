@@ -79,9 +79,25 @@ def editaddress(request, userdetails_id):
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
 
+# def userorders(request):
+#     cust = get_object_or_404(CustomUser, id=request.user.id)
+#     orders = Order.objects.filter(user=cust)
+
+#     # Number of items to show per page
+#     items_per_page = 2  # You can adjust this number as per your preference
+
+#     paginator = Paginator(orders, items_per_page)
+    
+#     page_number = request.GET.get('page')
+#     page_orders = paginator.get_page(page_number)
+    
+#     context = {'page_orders': page_orders, 'cust': cust}
+#     return render(request, 'profile/orders.html', context)
+
+
 def userorders(request):
     cust = get_object_or_404(CustomUser, id=request.user.id)
-    orders = Order.objects.filter(user=cust)
+    orders = Order.objects.filter(user=cust).order_by('-created_at')
 
     # Number of items to show per page
     items_per_page = 2  # You can adjust this number as per your preference

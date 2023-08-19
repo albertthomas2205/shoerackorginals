@@ -71,9 +71,11 @@
                     <p class="text-muted mt-1 mb-0 small ms-xl-5">{{order.get_status_display}}</p>
                   </div>
                 </div>
+              
                 <div class="d-flex justify-content-between pt-2">
                     <p class="fw-bold mb-0">Order Details</p>
-                    <p class="text-muted mb-0"><span class="fw-bold me-4">Total</span>₹{{order.total_price}}</p>
+
+                    <p class="text-muted mb-0"><span class="fw-bold me-4"></span>{{order.total_price}}</p>
                   </div>
       
                   <!-- <div class="d-flex justify-content-between pt-2">
@@ -108,7 +110,7 @@
                 </div>
                 <div class="d-flex justify-content-between pt-2">
                     <p class="fw-bold mb-0">Order Details</p>
-                    <p class="text-muted mb-0"><span class="fw-bold me-4">Total</span>₹{{order.total_price}}</p>
+                    <p class="text-muted mb-0"><span class="fw-bold me-4"></span>{{order.items.total_price}}</p>
                   </div>
 <!--           
                   <div class="d-flex justify-content-between pt-2">

@@ -16,21 +16,24 @@
         .login_box_area {
             min-height: 0;
             padding-bottom: 0;
+            color:blueviolet
         }
     }
 </style>
 </head>
 
+<div style="color:aqua">
 
-<body>
+
+<body >
   <!--  Body Wrapper -->
   <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
-    data-sidebar-position="fixed" data-header-position="fixed">
+    data-sidebar-position="fixed" data-header-position="fixed" >
     <!-- Sidebar Start -->
-    <aside class="left-sidebar">
+    <aside class="left-sidebar" >
       <!-- Sidebar scroll-->
-      <div>
-        <div class="brand-logo d-flex align-items-center justify-content-between ">
+      <div style="color:crimson">
+        <div class="brand-logo d-flex align-items-center justify-content-between " style="color:crimson">
           <a href="./index.html" class="text-nowrap logo-img">
             <img src="{% static 'static_admin/assets/images/logos/lgg.png' %}" width="180" alt="" />
           </a>
@@ -39,11 +42,13 @@
           </div>
         </div>
         <!-- Sidebar navigation-->
-        <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
+        <div style="color:blue">
+        <nav class="sidebar-nav scroll-sidebar" data-simplebar="" style="color:crimson">
           <ul id="sidebarnav">
             <li class="nav-small-cap">
               <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">Home</span>
+              <a href="{% url 'index' %}"><span class="hide-menu">Home</span></a>
+              
             </li>
             <li class="sidebar-item">
                 <a class="sidebar-link" href="{% url 'profilehome' %}" aria-expanded="false">
@@ -88,13 +93,14 @@
           </ul>
          
         </nav>
+      </div>
         <!-- End Sidebar navigation -->
       </div>
       <!-- End Sidebar scroll-->
     </aside>
     <!--  Sidebar End -->
     <!--  Main wrapper -->
-    <div class="body-wrapper">
+    <div class="body-wrapper" style="color: blue;">
       <!--  Header Start -->
       <header class="app-header">
         <nav class="navbar navbar-expand-lg navbar-light">
@@ -113,7 +119,7 @@
           </ul>
           <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
             <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
-              <a href="{% url 'signout' %}" target="_blank" class="btn btn-primary">logout</a>
+              <a href="{% url 'signoutt' %}" target="_blank" class="btn btn-primary">logout</a>
               <li class="nav-item dropdown">
                 <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown"
                   aria-expanded="false">
@@ -142,10 +148,11 @@
         </nav>
       </header>
       <!--  Header End -->
-      <div class="container-fluid">
+      <div class="container-fluid" style="color: blueviolet;">
      
           
-           
+      </div>      
+      
             {% block content %}
 
             
@@ -155,7 +162,7 @@
           
           
                    
-          
+         
         
         </div>
       </div>

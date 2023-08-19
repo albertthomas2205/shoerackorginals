@@ -84,6 +84,15 @@
                 <span class="hide-menu">Order </span>
               </a>
             </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'admincoupon' %}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-cards"></i>
+                </span>
+                <span class="hide-menu">Order </span>
+              </a>
+            </li>
+            
             
             
           </ul>
@@ -190,6 +199,7 @@
       }
     });
   </script>
+  {% block script %}{% endblock  %}
 </body>
 
 </html>
