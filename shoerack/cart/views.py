@@ -5,15 +5,20 @@ from cart.models import Cart, CartItem
 from adminside.models import Product,Productsize
 # from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-# from django.views.decorators.http import require_POST
 from user.models import Userdetails,CustomUser
-from .models import Cart, CartItem,Wishlist,Coupon,Usercoupon
+from .models import Cart, CartItem,Wishlist,Coupon,Usercoupon,Productsize
 from django.http import JsonResponse
 from django.utils import timezone
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from .models import Productsize, Cart, CartItem,Order,OrderItem
+from account.models import Order,OrderItem
 from django.db.models import F, Q, Sum
+from decimal import Decimal
+from django.views.decorators.http import require_POST
+from django.contrib import messages
+import razorpay
+from django.conf import settings
+
+
 
 
 @login_required(login_url='loginn') 
@@ -169,34 +174,36 @@ def thanku(request):
 
 
 def checkout(request):
-    addresses = Userdetails.objects.filter(userr=request.user)
+    address = Userdetails.objects.filter(userr=request.user).order_by("-created_at")
     cart = get_object_or_404(Cart, user=request.user)
     cart_items = CartItem.objects.filter(cart=cart)
-    
-    # Calculate the total price of items in the cart
-    total_price = sum(item.product.price * item.quantity for item in cart_items)
-    
-    # Convert the Decimal total_price to a float
-    total_price_float = float(total_price)
-    
-    # Add shipping charges and estimate tax
-    shipping_charges = 150
-    tax_percentage = 0.05
-    estimated_tax = total_price_float * tax_percentage
-    
-    # Calculate the final total price including shipping and tax
-    final_total = total_price_float + shipping_charges + estimated_tax
-    
+    k = 15
+    total_price = (
+        int(sum((item.product.price * item.quantity for item in cart_items))) + k
+    )
+
+    subtotal = total_price
+    dis = 0
+    if cart.coupon is not None:
+        coup = get_object_or_404(Coupon, id=cart.coupon.id)
+        dis = coup.discount
+        total_price -= dis
+    numitems = cart_items.count()
+    client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
+    payment = client.order.create(
+        {"amount": total_price * 100, "currency": "INR", "payment_capture": 1}
+    )
+    print(payment)
     context = {
-        'addresses': addresses,
-        'cart_items': cart_items,
-        'total_price': total_price,
-        'shipping_charges': shipping_charges,
-        'estimated_tax': estimated_tax,
-        'final_total': final_total,
+        "address": address,
+        "cart_items": cart_items,
+        "total_price": total_price,
+        "numitems": numitems,
+        "dis": dis,
+        "subtotal": subtotal,
+        "payment": payment,
     }
-    
-    return render(request, 'cartside/checkout.html', context)
+    return render(request, "checkout.html", context)
 
 
 
@@ -217,13 +224,6 @@ from django.http import HttpResponseForbidden
 
 
 
-from django.shortcuts import render
-from .models import Userdetails
-
-from django.shortcuts import render
-from .models import Cart
-
-from django.http import JsonResponse
 def tril (request):
    
     product = Product.objects.get(id=2)
@@ -252,19 +252,8 @@ def update_price(request):
 
 
 
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .models import Cart, CartItem
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from cart.models import CartItem  # Import the CartItem model
 
 
-
-
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from .models import CartItem
 
 @require_POST
 def update_cart_quantity(request):
@@ -286,62 +275,50 @@ def update_cart_quantity(request):
     return JsonResponse({'success': False, 'message': 'Invalid request method.'})
 
 
-from decimal import Decimal
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Cart, CartItem, Coupon, Order, OrderItem
 
-from decimal import Decimal
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Cart, CartItem, Coupon, Order, OrderItem
 
-def create_order(request):
-    if request.method == 'POST':
-        address_id = request.POST.get('address')
-        payment = request.POST.get('pay-method')
-        
-        # Get the user's cart
-        cart = get_object_or_404(Cart, user=request.user)
-        
-        # Get the selected address
-        address = get_object_or_404(Userdetails, id=address_id)
-        
-        # Calculate total price of items in the cart
-        total_price = cart.get_total_amount()
-        
-        # Check if a coupon is applied
-        coupon_discount = 0
-        if cart.coupon:
-            coupon = get_object_or_404(Coupon, id=cart.coupon.id)
-            coupon_discount = Decimal(coupon.discount)
-            total_price -= coupon_discount
-        
-        # Create the order
+def create_orders(request):
+    cart = get_object_or_404(Cart, user=request.user)
+    total_price = Decimal(0)
+    add = request.session.get("selected_address")
+    payment1 = request.session.get("pay-method")
+    address = get_object_or_404(Userdetails, id=add)
+    for cart_item in cart.items.all():
+        total_price += cart_item.product.price * cart_item.quantity
+    try:
+        coup = get_object_or_404(Coupon, id=cart.coupon.id)
+        dis = coup.discount
+        di = Decimal(dis)
+        total_price -= di
         order = Order.objects.create(
             user=request.user,
             address=address,
-            total_amount=total_price,  # Adjust this field based on your model
-            coupon_applied=cart.coupon if cart.coupon else None,
+            total_price=total_price,
+            payment_method=payment1,
+            coupon_applied=coup,
         )
-        
-        # Create order items and update product stock
-        for cart_item in cart.items.all():
-            order_item = OrderItem.objects.create(
-                order=order,
-                product=cart_item.product,
-                quantity=cart_item.quantity,
-                total_itemprice=cart_item.get_subtotal() - coupon_discount,
-            )
-            # Update product stock
-            product = cart_item.product
-            product.stock -= cart_item.quantity
-            product.save()
-
-        # Clear the cart after successful order
-        cart.items.all().delete()
-
-        return render(request, 'cartside/thankyou.html')
-
-    return render(request, 'cartside/thankyou.html')
+    except:
+        order = Order.objects.create(
+            user=request.user,
+            address=address,
+            total_price=total_price,
+            payment_method=payment1,
+        )
+    for cart_item in cart.items.all():
+        OrderItem.objects.create(
+            order=order,
+            product=cart_item.product,
+            quantity=cart_item.quantity,
+            total_itemprice=cart_item.product.price * cart_item.quantity,
+        )
+    for cart_item in cart.items.all():
+        product = cart_item.product
+        product.stock -= cart_item.quantity
+        product.save()
+    cart.items.all().delete()
+    cart.coupon = None
+    cart.save()
+    return render(request, "cartside/thankyou.html")
 
 
 
@@ -381,6 +358,121 @@ def Deletewishlist(request, id):
     d = Wishlist.objects.get(id=id)
     d.delete()
     return redirect("wishlist")
+
+def selectaddress(request):
+    if request.method == "POST":
+        add = request.POST.get("address")
+        paymen = request.POST.get("pay-method")
+        print(paymen)
+        request.session["selected_address"] = add
+        request.session["pay-method"] = paymen
+        if paymen != "Upi":
+            return redirect("thanku")
+        return JsonResponse({"message": "Order placed successfully"})
+
+    return JsonResponse({"message": "Invalid request method"})
+
+def create_orders(request):
+    cart = get_object_or_404(Cart, user=request.user)
+    total_price = Decimal(0)
+    add = request.session.get("selected_address")
+    payment1 = request.session.get("pay-method")
+    address = get_object_or_404(Userdetails, id=add)
+    for cart_item in cart.items.all():
+        total_price += cart_item.product.price * cart_item.quantity
+    try:
+        coup = get_object_or_404(Coupon, id=cart.coupon.id)
+        dis = coup.discount
+        di = Decimal(dis)
+        total_price -= di
+        order = Order.objects.create(
+            user=request.user,
+            address=address,
+            total_price=total_price,
+            payment_method=payment1,
+            coupon_applied=coup,
+        )
+    except:
+        order = Order.objects.create(
+            user=request.user,
+            address=address,
+            total_price=total_price,
+            payment_method=payment1,
+        )
+    for cart_item in cart.items.all():
+        OrderItem.objects.create(
+            order=order,
+            product=cart_item.product,
+            quantity=cart_item.quantity,
+            total_itemprice=cart_item.product.price * cart_item.quantity,
+        )
+    for cart_item in cart.items.all():
+        product = cart_item.product
+        product.stock -= cart_item.quantity
+        product.save()
+    message = "Order placed successfully"
+    cart.items.all().delete()
+    cart.coupon = None
+    cart.save()
+    return render(request, "cartside/thanku.html")
+
+@login_required
+def create_order(request):
+    cart = get_object_or_404(Cart, user=request.user)
+    total_price = Decimal(0)
+    add = request.session.get("selected_address")
+    payment1 = request.session.get("pay-method")
+    address = get_object_or_404(Userdetails, id=add)
+    for cart_item in cart.items.all():
+        total_price += cart_item.product.price * cart_item.quantity
+    try:
+        coup = get_object_or_404(Coupon, id=cart.coupon.id)
+        dis = coup.discount
+        di = Decimal(dis)
+        total_price -= di
+        total_price_float = float(total_price)
+        order = Order.objects.create(
+            user=request.user,
+            address=address,
+            total_price=total_price,
+            payment_method=payment1,
+            coupon_applied=coup,
+        )
+    except:
+        total_price_float = float(total_price)
+        order = Order.objects.create(
+            user=request.user,
+            address=address,
+            total_price=total_price,
+            payment_method=payment1,
+        )
+    client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
+    payment = client.order.create(
+        {
+            "amount": int(total_price_float * 100),
+            "currency": "INR",
+            "payment_capture": 1,
+        }
+    )
+    order.razor_pay_payment_id = payment["id"]
+    order.save()
+    print(payment["id"])
+    for cart_item in cart.items.all():
+        OrderItem.objects.create(
+            order=order,
+            product=cart_item.product,
+            quantity=cart_item.quantity,
+            total_itemprice=cart_item.product.price * cart_item.quantity,
+        )
+    for cart_item in cart.items.all():
+        product = cart_item.product
+        product.stock -= cart_item.quantity
+        product.save()
+    message = "Order placed successfully"
+    cart.items.all().delete()
+    cart.coupon = None
+    cart.save()
+    return render(request, "cartside/thankyou.html")
 
 
 

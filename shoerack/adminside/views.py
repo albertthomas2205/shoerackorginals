@@ -9,7 +9,7 @@ from .models import Category,Product,ProductImage,Brand
 from django.shortcuts import render, redirect
 from .models import Category
 from .forms import ProductForm, ProductImageForm,Productsize,ProductsizeForm
-from cart.models import Order
+from account.models import Order
 from decimal import Decimal
 from datetime import datetime
 from django.db.models import Q

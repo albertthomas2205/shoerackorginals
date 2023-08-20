@@ -173,3 +173,6 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
+
+razor_pay_key_id = 'rzp_test_lCPwFk1fVNkzxq'
+key_secret = 'XIM7YrvSXKWouboilyqQ5bGh'

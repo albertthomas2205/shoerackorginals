@@ -5,7 +5,7 @@ from django.core.mail import send_mail
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
 from user.models import Userdetails,CustomUser,CustomUserManager
-from cart.models import Order
+from account.models import Order
 from django.contrib.auth import authenticate
     
 

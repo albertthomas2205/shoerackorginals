@@ -536,4 +536,84 @@
     
 {% endblock  %}
 {% block loadmore %}{% endblock  %}
+                            
+ {% block jsss %}
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#rzp-button1').click(function(e) {
+        e.preventDefault(); // Prevent the default form submission
+
+        // Gather form data
+        var selectedAddress = $('input[name="address"]:checked').val();
+        var selectedPaymentMethod = $('input[name="pay-method"]:checked').val();
+
+        // Send form data to the server using AJAX
+        $.ajax({
+            url: "{% url 'selectaddress' %}",
+            method: "POST",
+            data: {
+                address: selectedAddress,
+                'pay-method': selectedPaymentMethod,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            success: function(response) {
+                // Handle the server's response if needed
+            },
+            error: function(error) {
+                // Handle errors if any
+            }
+        });
+        if (selectedPaymentMethod !== 'Upi') {
+            // Redirect to a different page for COD
+            window.location.href = '{% url 'createorders' %}';
+        }
+    });
+});
+</script>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+var options = {
+        
+    "key": "rzp_test_lCPwFk1fVNkzxq", // Enter the Key ID generated from the Dashboard
+    "amount": "{{payment.amount}}", 
+    "currency": "INR",
+    "name": "Tails and co", 
+    "description": "Purchases",
+    "image": "https://i.ibb.co/xHXKQyt/Screenshot-2023-07-26-144602.png",
+    "order_id": "{{payment.id}}", 
+    "handler": function (response){
+
+        window.location.href = `http://127.0.0.1:8000/createorder?razorpay_payment_id=${response.razorpay_payment_id}&razorpay_order_id=${response.razorpay_order_id}`;
+  
+         
+      },
+   
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+var rzp1 = new Razorpay(options);
+document.getElementById('rzp-button1').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+}
+rzp1.on('payment.success', function(response) {
+    console.log('Payment successful:', response);
+    // Redirect to the success page
+    window.location.href = 'createorder/';
+});
+
+
+
+    <!-- Include jQuery library -->
+
+
+
+</script>
+    
+{% endblock  %} 
 {% block footer %} {% endblock  %}
