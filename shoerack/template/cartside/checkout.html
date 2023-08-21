@@ -406,15 +406,7 @@
                     </div>
                     <div class=" bg-light rounded rounded-pill shadow-sm mb-3">
                         <!-- <label for="button" style="color: black;">Apply coupon</label> -->
-                        <div class="input-group">
-                            <input type="search" placeholder="Apply coupon" aria-describedby="button-addon1" class="form-control border-0 bg-light font-size-5">
-                            <div class="input-group-append" style="color: rgb(60, 57, 57);">
-                                <button id="" type="submit" class="btn " >apply</button>
-                            </div>
-                            <div class="input-group-append" style="color: darkblue;">
-                                <button id="" type="button" data-toggle="modal" data-target="#exampleModal-4" class="btn" >view coupons</button>
-                            </div>
-                        </div>
+                        
                     </div>
                     <div class="table-responsive">
                         <table class="table table-centered mb-0 table-nowrap">
@@ -425,32 +417,29 @@
                                     <th class="border-top-0" scope="col">Price</th>
                                 </tr>
                             </thead>
-
                             <tbody>
                                 {% for cartitem in cart_items %}
                                 <tr>
-                                    <th scope="row"><img src="{{cartitem.product.product.images.first.image.url}}" alt="product-img" title="product-img" class="avatar-lg rounded"></th>
+                                    <th scope="row"><img src="{{ cartitem.product.product.images.first.image.url}}" alt="product-img" title="product-img" class="avatar-lg rounded"></th>
                                     <td>
                                         <h5 class="font-size-16 text-truncate"><a href="#" class="text-dark">{{cartitem.product.product.name}}</a></h5>
                                         <p class="text-muted mb-0">
+                                            <!-- <i class="bx bxs-star text-warning"></i>
                                             <i class="bx bxs-star text-warning"></i>
                                             <i class="bx bxs-star text-warning"></i>
                                             <i class="bx bxs-star text-warning"></i>
-                                            <i class="bx bxs-star text-warning"></i>
-                                            <i class="bx bxs-star-half text-warning"></i>
+                                            <i class="bx bxs-star-half text-warning"></i> -->
                                         </p>
                                         <p class="text-muted mb-0 mt-1">{{cartitem.product.price}} x {{cartitem.quantity}}</p>
                                     </td>
-                                    <td>
-                                        {{cartitem.get_subtotal}}
-                                       </td>
+                                  
 
                                 </tr>
                                     <td colspan="2">
-                                        <h6 class="font-size-14 m-0">Discount :</h6>
+                                        <h6 class="font-size-14 m-0">Subtotal</h6>
                                     </td>
                                     <td>
-                                   
+                                        ₹{{subtotal}}
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -459,15 +448,15 @@
                                         <h6 class="font-size-14 m-0">Shipping Charge :</h6>
                                     </td>
                                     <td>
-                                      {{shipping_charges}}
+                                        ₹15
                                     </td>
                                 </tr>
                                 <tr>
                                     <td colspan="2">
-                                        <h6 class="font-size-14 m-0">Estimated Tax :</h6>
+                                        <h6 class="font-size-14 m-0">Coupon Discount :</h6>
                                     </td>
                                     <td>
-                                     {{estimated_tax}}
+                                        -₹{{dis}}
                                     </td>
                                 </tr>                              
                                     
@@ -476,10 +465,11 @@
                                         <h5 class="font-size-14 m-0">Total:</h5>
                                     </td>
                                     <td>
-                                        {{ final_total }}
+                                        ₹{{total_price}}
                                     </td>
                                 </tr>
                             </tbody>
+                            
                         </table>
                         
                     </div>

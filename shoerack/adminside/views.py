@@ -13,6 +13,7 @@ from account.models import Order
 from decimal import Decimal
 from datetime import datetime
 from django.db.models import Q
+from django.core.exceptions import ValidationError
 
 
 
@@ -315,27 +316,59 @@ from django.shortcuts import render, redirect
 from cart.models import Coupon
 
 
+# def Admincoupon(request):
+#     if request.method == "POST":
+#         code = request.POST.get("code")
+#         discount = request.POST.get("discount")
+#         minamount = request.POST.get("minamount")
+#         valid_from_str = request.POST.get("from")
+#         valid_to_str = request.POST.get("to")
+#         valid_from = datetime.strptime(valid_from_str, "%m/%d/%Y").strftime(
+#             "%Y-%m-%d %H:%M:%S"
+#         )
+#         valid_to = datetime.strptime(valid_to_str, "%m/%d/%Y").strftime(
+#             "%Y-%m-%d %H:%M:%S"
+#         )
+#         Coupon.objects.create(
+#             code=code,
+#             minimumamount=minamount,
+#             discount=discount,
+#             valid_from=valid_from,
+#             valid_to=valid_to,
+#         )
+#         return redirect("admincoupon")
+#     datas = Coupon.objects.all()
+#     return render(request, "admin_panel/coupons.html", {"datas": datas})
+
+
 def Admincoupon(request):
     if request.method == "POST":
-        code = request.POST.get("code")
-        discount = request.POST.get("discount")
-        minamount = request.POST.get("minamount")
-        valid_from_str = request.POST.get("from")
-        valid_to_str = request.POST.get("to")
-        valid_from = datetime.strptime(valid_from_str, "%m/%d/%Y").strftime(
-            "%Y-%m-%d %H:%M:%S"
-        )
-        valid_to = datetime.strptime(valid_to_str, "%m/%d/%Y").strftime(
-            "%Y-%m-%d %H:%M:%S"
-        )
-        Coupon.objects.create(
-            code=code,
-            minimumamount=minamount,
-            discount=discount,
-            valid_from=valid_from,
-            valid_to=valid_to,
-        )
-        return redirect("admincoupon")
+        try:
+            code = request.POST.get("code")
+            discount = request.POST.get("discount")
+            minamount = request.POST.get("minamount")
+            valid_from_str = request.POST.get("from")
+            valid_to_str = request.POST.get("to")
+            
+            valid_from = datetime.strptime(valid_from_str, "%d/%m/%Y").strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
+            valid_to = datetime.strptime(valid_to_str, "%d/%m/%Y").strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
+            
+            Coupon.objects.create(
+                code=code,
+                minimumamount=minamount,
+                discount=discount,
+                valid_from=valid_from,
+                valid_to=valid_to,
+            )
+            return redirect("admincoupon")
+        except ValueError:
+            error_message = "Invalid date format. Please use the format dd/mm/yyyy."
+            datas = Coupon.objects.all()
+            return render(request, "admin_panel/coupons.html", {"datas": datas, "error_message": error_message})
     datas = Coupon.objects.all()
     return render(request, "admin_panel/coupons.html", {"datas": datas})
 

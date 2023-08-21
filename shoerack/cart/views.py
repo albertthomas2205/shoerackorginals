@@ -278,48 +278,48 @@ def update_cart_quantity(request):
 
 
 
-def create_orders(request):
-    cart = get_object_or_404(Cart, user=request.user)
-    total_price = Decimal(0)
-    add = request.session.get("selected_address")
-    payment1 = request.session.get("pay-method")
-    address = get_object_or_404(Userdetails, id=add)
-    for cart_item in cart.items.all():
-        total_price += cart_item.product.price * cart_item.quantity
-    try:
-        coup = get_object_or_404(Coupon, id=cart.coupon.id)
-        dis = coup.discount
-        di = Decimal(dis)
-        total_price -= di
-        order = Order.objects.create(
-            user=request.user,
-            address=address,
-            total_price=total_price,
-            payment_method=payment1,
-            coupon_applied=coup,
-        )
-    except:
-        order = Order.objects.create(
-            user=request.user,
-            address=address,
-            total_price=total_price,
-            payment_method=payment1,
-        )
-    for cart_item in cart.items.all():
-        OrderItem.objects.create(
-            order=order,
-            product=cart_item.product,
-            quantity=cart_item.quantity,
-            total_itemprice=cart_item.product.price * cart_item.quantity,
-        )
-    for cart_item in cart.items.all():
-        product = cart_item.product
-        product.stock -= cart_item.quantity
-        product.save()
-    cart.items.all().delete()
-    cart.coupon = None
-    cart.save()
-    return render(request, "cartside/thankyou.html")
+# def create_orders(request):
+#     cart = get_object_or_404(Cart, user=request.user)
+#     total_price = Decimal(0)
+#     add = request.session.get("selected_address")
+#     payment1 = request.session.get("pay-method")
+#     address = get_object_or_404(Userdetails, id=add)
+#     for cart_item in cart.items.all():
+#         total_price += cart_item.product.price * cart_item.quantity
+#     try:
+#         coup = get_object_or_404(Coupon, id=cart.coupon.id)
+#         dis = coup.discount
+#         di = Decimal(dis)
+#         total_price -= di
+#         order = Order.objects.create(
+#             user=request.user,
+#             address=address,
+#             total_price=total_price,
+#             payment_method=payment1,
+#             coupon_applied=coup,
+#         )
+#     except:
+#         order = Order.objects.create(
+#             user=request.user,
+#             address=address,
+#             total_price=total_price,
+#             payment_method=payment1,
+#         )
+#     for cart_item in cart.items.all():
+#         OrderItem.objects.create(
+#             order=order,
+#             product=cart_item.product,
+#             quantity=cart_item.quantity,
+#             total_itemprice=cart_item.product.price * cart_item.quantity,
+#         )
+#     for cart_item in cart.items.all():
+#         product = cart_item.product
+#         product.stock -= cart_item.quantity
+#         product.save()
+#     cart.items.all().delete()
+#     cart.coupon = None
+#     cart.save()
+#     return render(request, "cartside/thankyou.html")
 
 
 

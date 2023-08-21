@@ -103,11 +103,42 @@
                         </table>
            
                     </div>
-  
+                        
+      
                         
                     <div class="flex-w flex-sb-m bor15 p-t-18 p-b-15 p-lr-40 p-lr-15-sm">
-                   
-                            {% if messages %}
+                        {% if messages %}
+                  
+                        {% for message in messages %}
+                            {% if '2' in message.message %}
+                                <p class="error" style="color: red;">{{ message.message|cut:"(2)" }}</p>
+                            {% else %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% endif %}
+
+                        {% if cart.coupon %}
+                        <p style="color: green;">Coupon applied <a id="remove-coupon-link" href="{% url 'removecoupon' %}" style="color: inherit; text-decoration: none;"><button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">×</button></a> </p>
+                        {% else %}
+                            <form id="apply-coupon-form" method="post" action="{% url 'apply_coupon' %}">
+                                {% csrf_token %}
+                                <div class="input-group">
+                                    <input placeholder="Apply coupon" aria-describedby="button-addon1" class="form-control border-0 bg-light font-size-5" name="code" id="coupon-code-input">
+                                    <div class="input-group-append" style="color: rgb(60, 57, 57);">
+                                        <button type="submit" class="btn">Apply</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <p id="coupon-message" style="color: red;"></p>
+                        {% endif %}
+                    
+                            
+                        
+                        {% comment %} %%%%%%%%%%%5 {% endcomment %}
+                        
+                       {% comment %}  
+                        {% if messages %}
                   
                             {% for message in messages %}
                                 {% if '2' in message.message %}
@@ -137,9 +168,11 @@
                     {% endif %}
                 
 
-                    
+                     {% endcomment %}
                 </div>
             </div>
+        </div>
+        
             
             <div class="col-sm-10 col-lg-7 col-xl-5 m-lr-auto m-b-50">
                 <div class="bor10 p-lr-40 p-t-30 p-b-40 m-l-63 m-r-40 m-lr-0-xl p-lr-15-sm">
