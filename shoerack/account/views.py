@@ -4,7 +4,8 @@ from adminside.forms import UserdetailsForm
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
-from user.models import Userdetails,CustomUser,CustomUserManager
+from user.models import CustomUser,CustomUserManager
+from account.models import Userdetails
 from account.models import Order
 from django.contrib.auth import authenticate
     
@@ -21,9 +22,6 @@ def profilehome(request):
 def viewaddress(request):
     # Retrieve the logged-in user's details
     addresses = Userdetails.objects.filter(userr=request.user)
-    print('haiiii')
-    print(addresses)
-
     # Pass the user_details object to the HTML template
     return render(request, 'profile/viewadddress.html', {'addresses': addresses})
 

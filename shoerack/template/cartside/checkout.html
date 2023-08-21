@@ -488,7 +488,7 @@
             {% if addresses %}
             <div class="col">
                 <div class="text-end mt-2 mt-sm-0">
-                    <a href="{% url 'createorder' %}"><button class="btn btn-success">Place order</button> </a>
+                    <button class="btn btn-success" id="rzp-button1" type="button">Place order</button> 
                 </div>
             </div>{% else %}
             <h6 style="color: red;">Add address to checkout</h6>
@@ -540,7 +540,7 @@
  {% block jsss %}
 
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% comment %} <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
     $('#rzp-button1').click(function(e) {
@@ -572,7 +572,7 @@ $(document).ready(function() {
         }
     });
 });
-</script>
+</script> {% endcomment %}
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>

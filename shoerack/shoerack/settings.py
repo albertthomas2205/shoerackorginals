@@ -101,6 +101,17 @@ DATABASES = {
     }
 }
 
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'SHOERACK',
+#         'USER': 'postgres',
+#         'PASSWORD': 'albert',
+#         'HOST': 'localhost',  # Use appropriate host
+#         'PORT': '',  # Leave empty for default port
+#     }
+# }
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
@@ -174,5 +185,5 @@ INTERNAL_IPS = [
     # ...
 ]
 
-razor_pay_key_id = 'rzp_test_lCPwFk1fVNkzxq'
-key_secret = 'XIM7YrvSXKWouboilyqQ5bGh'
+KEY = 'rzp_test_lCPwFk1fVNkzxq'
+SECRET = 'XIM7YrvSXKWouboilyqQ5bGh'

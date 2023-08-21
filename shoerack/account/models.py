@@ -1,13 +1,35 @@
 from django.db import models
 
-# Create your models here.
+
 from django.db import models
-from user.models import CustomUser,Userdetails
-from cart.models import Coupon
+from user.models import CustomUser
 from adminside.models import Product,ProductImage,Productsize
 from django.template.defaultfilters import slugify
+class Coupon(models.Model):
+    code = models.CharField(max_length=20, unique=True)
+    minimumamount = models.IntegerField()
+    discount = models.FloatField()
+    valid_from = models.DateTimeField()
+    valid_to = models.DateTimeField()
+    active = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return self.code
 
-
+class Userdetails(models.Model):
+    userr = models.ForeignKey(CustomUser,on_delete = models.CASCADE)
+    custom_name = models.CharField(max_length = 50)
+    house_name = models.CharField(max_length = 30)
+    landmark = models.CharField(max_length=50)
+    pincode = models.IntegerField()
+    city = models.CharField(max_length = 40)
+    state = models.CharField(max_length = 50)
+    alternative_ph = models.CharField(max_length= 50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.userr
+    
 class Order(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -49,7 +71,7 @@ class OrderItem(models.Model):
     def __str__(self):
         return f"{self.product.name} - {self.quantity}"
 
-class dog(models.Model):
-    name = models.CharField(max_length=10)
     
+
+
 

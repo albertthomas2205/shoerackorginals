@@ -1,7 +1,7 @@
 
 from django import forms
 from .models import Product,ProductImage,Productsize
-from user.models import Userdetails
+from account.models import Userdetails
 
 class ProductForm(forms.ModelForm):
     class Meta:

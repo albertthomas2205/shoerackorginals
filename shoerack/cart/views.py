@@ -5,7 +5,8 @@ from cart.models import Cart, CartItem
 from adminside.models import Product,Productsize
 # from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from user.models import Userdetails,CustomUser
+from user.models import CustomUser
+from account.models import Userdetails
 from .models import Cart, CartItem,Wishlist,Coupon,Usercoupon,Productsize
 from django.http import JsonResponse
 from django.utils import timezone
@@ -195,7 +196,7 @@ def checkout(request):
     )
     print(payment)
     context = {
-        "address": address,
+        "addresses": address,
         "cart_items": cart_items,
         "total_price": total_price,
         "numitems": numitems,
@@ -203,7 +204,7 @@ def checkout(request):
         "subtotal": subtotal,
         "payment": payment,
     }
-    return render(request, "checkout.html", context)
+    return render(request, "cartside/checkout.html", context)
 
 
 

@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate,login,logout,validators
 from .models import CustomUserManager
 from django.contrib.sessions.models import Session
 from adminside.models import Product,ProductImage,Category,Productsize,Brand
-from user.models import Userdetails
+from account.models import Userdetails
 from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -15,7 +15,7 @@ from .models import CustomUser
 from cart.models import CartItem
 
 
-# Create your views here.
+# # Create your views here.
 def index(request):
     products = Product.objects.all()
     category = Category.objects.all()
@@ -184,7 +184,7 @@ def category(request, id):
     return render(request, 'userside/category.html', context)
 
     
-from .models import Userdetails
+from account.models import Userdetails
 from adminside.forms import UserdetailsForm  # Create a Django form for Userdetails
 
 def shop(request):
