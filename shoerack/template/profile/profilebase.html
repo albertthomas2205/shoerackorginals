@@ -9,7 +9,13 @@
   <title>ShoeRack</title>
   <link rel="shortcut icon" type="image/png" href="{% static 'static_admin/assets/images/logos/lgg.png' %}" />
   <link rel="stylesheet" href="{% static 'static_admin/assets/css/styles.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/trackorder.css' %}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   {% block js %}{% endblock %}
+  {% block static %}{% endblock  %}
   <style>
     /* Custom CSS to make the section square at medium devices */
     @media (min-width: 768px) {
@@ -23,7 +29,6 @@
 </head>
 
 <div style="color:aqua">
-
 
 <body >
   <!--  Body Wrapper -->
@@ -148,15 +153,17 @@
         </nav>
       </header>
       <!--  Header End -->
-      <div class="container-fluid" style="color: blueviolet;">
+    
+      <div class="container-fluid" style="color:black;">
+
+          
+      {% block content %}
+            
+      {% endblock  %}
      
           
       </div>      
       
-            {% block content %}
-
-            
-            {% endblock  %}
             
             
           

@@ -1,13 +1,12 @@
 from django.shortcuts import render,redirect,get_object_or_404
 
 # Create your views here.
-from cart.models import Cart, CartItem
-from adminside.models import Product,Productsize
-# from django.shortcuts import render, redirect, get_object_or_404
+from account.models import Cart, CartItem,Coupon
+from adminside.models import Product,Productsize,ProductImage
+from cart.models import Usercoupon,Wishlist
 from django.contrib.auth.decorators import login_required
 from user.models import CustomUser
 from account.models import Userdetails
-from .models import Cart, CartItem,Wishlist,Coupon,Usercoupon,Productsize
 from django.http import JsonResponse
 from django.utils import timezone
 from django.http import JsonResponse
@@ -18,6 +17,7 @@ from django.views.decorators.http import require_POST
 from django.contrib import messages
 import razorpay
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 
 
 
@@ -33,12 +33,7 @@ def add_to_cart(request,id):
     request.session['item_added_to_cart'] = True
     id = product.product_id
     print(id)
-   
     return redirect('product_detail',id)
-      
-
-
-
 
 
 
@@ -61,6 +56,15 @@ def show_cart(request):
     
 
     return render(request, 'cartside/cart.html', context)
+
+def get_product_size_id(request):
+    selected_size = request.GET.get('size')
+    try:
+        product_size = Productsize.objects.get(size=selected_size)
+        product_size_id = product_size.id
+        return JsonResponse({'product_size_id': product_size_id})
+    except Productsize.DoesNotExist:
+        return JsonResponse({'error': 'Size not found'}, status=400)
 
 @login_required(login_url='loginn')
 def CartDetail(request):
@@ -170,7 +174,7 @@ def apply_coupon(request):
 
 
 def thanku(request):
-    return render(request, "thanku.html")
+    return render(request, "cartside/thankyou.html")
 
 
 
@@ -210,7 +214,6 @@ def checkout(request):
 
 
 
-
 def delete_cart_item(request, item_id):
     cart_item = get_object_or_404(CartItem, id=item_id)
 
@@ -232,9 +235,9 @@ def tril (request):
     return render(request,'cartside/tril.html',context)
 
         
-def product_detail_view(request, product_id):
-    product = get_object_or_404(Product, pk=product_id)
-    return render(request, 'cartside/tril.html', {'product': product})
+# def product_detail_view(request, product_id):
+#     product = get_object_or_404(Product, pk=product_id)
+#     return render(request, 'cartside/tril.html', {'product': product})
 
 from django.http import JsonResponse
 from .models import Product, Productsize
@@ -368,7 +371,7 @@ def selectaddress(request):
         request.session["selected_address"] = add
         request.session["pay-method"] = paymen
         if paymen != "Upi":
-            return redirect("thanku")
+            return redirect("thankyou")
         return JsonResponse({"message": "Order placed successfully"})
 
     return JsonResponse({"message": "Invalid request method"})
@@ -377,7 +380,7 @@ def create_orders(request):
     cart = get_object_or_404(Cart, user=request.user)
     total_price = Decimal(0)
     add = request.session.get("selected_address")
-    payment1 = request.session.get("pay-method")
+    payment1 = 'COD'
     address = get_object_or_404(Userdetails, id=add)
     for cart_item in cart.items.all():
         total_price += cart_item.product.price * cart_item.quantity
@@ -415,7 +418,7 @@ def create_orders(request):
     cart.items.all().delete()
     cart.coupon = None
     cart.save()
-    return render(request, "cartside/thanku.html")
+    return render(request, "cartside/thankyou.html")
 
 @login_required
 def create_order(request):
@@ -474,6 +477,22 @@ def create_order(request):
     cart.coupon = None
     cart.save()
     return render(request, "cartside/thankyou.html")
+
+# @csrf_exempt
+# @require_POST
+# def add_to_cart(request):
+#     product_size_id = request.POST.get('product_size_id')
+#     selected_size = request.POST.get('selected_size')  # Get the selected size
+    
+#     try:
+#         product_size = Productsize.objects.get(id=product_size_id)
+
+        
+#         response_data = {'success': True, 'message': 'Product added to cart.'}
+#     except Productsize.DoesNotExist:
+#         response_data = {'success': False, 'message': 'Product size not found.'}
+    
+#     return JsonResponse(response_data)
 
 
 

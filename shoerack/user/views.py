@@ -12,7 +12,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .helpers import send_otp_phone
 from .models import CustomUser
-from cart.models import CartItem
+from account.models import CartItem,Cart
+from cart.models import Wishlist
 
 
 # # Create your views here.
@@ -132,6 +133,31 @@ def product_detail_view(request, product_id):
     context = {'product': product, 'k': k, 'products': relatedproducts}
     return render(request, 'userside/singleproduct.html', context)
 
+def singproduct(request, id):
+    data = Productsize.objects.get(id=id)
+    product = Product.objects.get(productsize=data)
+    current_brand = product.brand
+    relatedproducts = Product.objects.filter(brand=current_brand).exclude(pk=id)
+    psize = Productsize.objects.filter(product=product)
+    k = ProductImage.objects.filter(product=product)
+    try:
+        w=Wishlist.objects.get(product=data)
+        context = {
+            "data": data,
+            "k": k,
+            "psize": psize,
+            'w':w
+        }
+    except:
+        context = {
+            "data": data,
+            "k": k,
+            "psize": psize,
+            'products':relatedproducts
+        }
+        
+    return render(request, "userside/singleproduct.html", context)
+
 from django.http import JsonResponse
 
 
@@ -145,6 +171,21 @@ def update_price(request):
             return JsonResponse({'price': str(product_size.price)})
         except (Product.DoesNotExist, Productsize.DoesNotExist):
             return JsonResponse({'error': 'Product or size not found'}, status=400)
+        
+def cartaddjs(request, id):
+    cart, created = Cart.objects.get_or_create(user=request.user)
+    product = get_object_or_404(Productsize, id=id)
+    cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+    cart_item.quantity += 1
+    cart_item.save()
+
+    # Add a success message
+    response_data = {
+        "message": "Product added to cart successfully",
+        "product_id": id,
+    }
+
+    return JsonResponse(response_data)
 
 
 def base(request):

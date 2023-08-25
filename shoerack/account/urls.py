@@ -15,5 +15,9 @@ urlpatterns = [
     path('forgototp/',views.forgototp,name='forgototp'),
     path('forgotpassword/',views.forgotpassword,name='forgotpassword'),
     path('resendotp/',views.Resendotp,name='resendotp'),
-    path('resetpassword/',views.resetpassword,name='resetpassword')
+    path('resetpassword/',views.resetpassword,name='resetpassword'),
+    path('order_deatails/<int:id>/',views.order_deatails,name='order_deatails'),
+    path('userorder_cancel/<int:id>/', views.userorder_cancel, name='userorder_cancel'),
+    path('product_return/<int:id>/', views.product_return, name='product_return'),
+ 
 ]

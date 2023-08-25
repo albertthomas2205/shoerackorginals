@@ -9,6 +9,12 @@
   <title>ShoeRack</title>
   <link rel="shortcut icon" type="image/png" href="{% static 'static_admin/assets/images/logos/lgg.png' %}" />
   <link rel="stylesheet" href="{% static 'static_admin/assets/css/styles.min.css' %}" />
+  <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>z
+  <style>
+      #cropper-container {
+          max-width: 100%;
+      }
+  </style>
   {% block js %}{% endblock %}
   {% block css %}{% endblock %}
 </head>
@@ -85,11 +91,11 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'admincoupon' %}" aria-expanded="false">
+              <a class="sidebar-link" href="{% url 'returns' %}" aria-expanded="false">
                 <span>
                   <i class="ti ti-cards"></i>
                 </span>
-                <span class="hide-menu">Order </span>
+                <span class="hide-menu">Return</span>
               </a>
             </li>
             
@@ -154,19 +160,20 @@
       <!--  Header End -->
       <div class="container-fluid">
         <div class="card">
-          <div class="card-body">
+          
             <h5 class="card-title fw-semibold mb-4"> {% block heading %}{% endblock  %}</h5>
             <p class="mb-0"> {% block subheading %}{% endblock  %} </p>
             <br>
-            {% block content %}{% endblock  %}
+            
             <div class="container mt-3">
               <div class="row">
+                {% block content %}{% endblock  %}
                 
             
                           <div class="d-grid gap-2 col-md-2">
                              
                           </div>
-                      </div>
+                     
                   </div>
               </div>
           
@@ -180,14 +187,17 @@
    
   
 
-  
+      
+      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+{% comment %}   
   <script src="{% static 'staic_admin/assets/libs/jquery/dist/jquery.min.js' %}"></script>
-  <script src="{% static 'static_admin/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
+  {% comment %} <script src="{% static 'static_admin/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script> 
   <script src="{% static 'static_admin/assets/js/sidebarmenu.js' %}"></script>
   <script src="{% static 'static_admin/assets/js/app.min.js' %}"></script>
-  <script src="{% static 'static_admin/assets/libs/simplebar/dist/simplebar.js' %}"></script>
+  <script src="{% static 'static_admin/assets/libs/simplebar/dist/simplebar.js' %}"></script> {% endcomment %}
 
-  <script>
+  {% comment %} <script>
     window.addEventListener('DOMContentLoaded', function() {
       var table = document.getElementById('data-table');
       var rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
@@ -198,7 +208,7 @@
         serialNumberCell.textContent = (i + 1).toString();
       }
     });
-  </script>
+  </script> {% endcomment %}
   {% block script %}{% endblock  %}
 </body>
 

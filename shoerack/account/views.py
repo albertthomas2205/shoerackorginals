@@ -5,9 +5,10 @@ from django.core.mail import send_mail
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
 from user.models import CustomUser,CustomUserManager
-from account.models import Userdetails
-from account.models import Order
+from account.models import Userdetails,Wallethistory,Wallet
+from account.models import Order,OrderItem,OrderReturn
 from django.contrib.auth import authenticate
+from decimal import Decimal
     
 
 
@@ -15,8 +16,11 @@ from django.contrib.auth import authenticate
 # Create your views here.
 def profilehome(request):
     addresses = request.user
+    id = Wallet.objects.get(user= request.user)
+    wallet=id
+    wallethistory = Wallethistory.objects.filter(wallet=id)
     
-    return render(request,'profile/profilehome.html',{'addresses':addresses})
+    return render(request,'profile/profilehome.html',{'addresses':addresses ,'wallethistory':wallethistory ,'wallet':wallet})
 
 
 def viewaddress(request):
@@ -108,13 +112,32 @@ def userorders(request):
     context = {'page_orders': page_orders, 'cust': cust}
     return render(request, 'profile/orders.html', context)
 
+def order_deatails(request,id):
+    order=Order.objects.get(id=id)
+    order_items=OrderItem.objects.filter(order=order)
+    try:
+        x=Decimal(order.coupon_applied.discount)
+        sub_price = order.total_price + x
+    except:
+        sub_price = order.total_price
+    address=Userdetails.objects.get(id=order.address.id)
+    context={'order_items':order_items,'order':order,'sub_price':sub_price,'address':address}
+    return render(request, 'profile/orderitems.html',context)
+
 
 
 def Usercancel(request,id):
-    edit=get_object_or_404(Order,id=id)
+    edit=get_object_or_404(OrderItem,id=id)
     edit.status='C'
     edit.save()
     return redirect('userorders')
+
+def userorder_cancel(request,id):
+    edit=OrderItem.objects.get(id=id)
+    edit.status='C'
+    edit.save()
+    id = edit.order.id
+    return redirect('order_deatails',id)
     
 def forgototp(request):
     if request.method == 'POST':
@@ -185,5 +208,25 @@ def resetpassword (request):
                 return redirect('profilehome')
     return render(request,'profile/resetpassword.html')
                 
+def product_return(request,id):
+    orderitem=OrderItem.objects.get(id=id)
+    orderitem.returnstatus = True
+    orderitem.save()
+    try:
+        c = orderitem.order.coupon_applied
+        order = OrderItem.objects.filter(order=orderitem.order)
+        count = order.count()
+        k = 15
+        first = c.discount//count
+        fi = Decimal(first)
+        total_price= orderitem.total_itemprice - fi + k
+        print(total_price)
+    except:
+        k = 15
+        total_price =orderitem.total_itemprice + k
+    finally:
+        OrderReturn.objects.create(orderitem=orderitem,user=request.user,total_price=total_price)
+        id = orderitem.order.id
+    return redirect('order_deatails',id)
 
         

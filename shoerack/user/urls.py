@@ -21,6 +21,8 @@ urlpatterns = [
     path('category/search',views.search,name='categorysearch'),
     path('send_otp/',views.send_otp,name = 'send_otp'),
     path('verify_otp/',views.verify_otp, name = 'verify_otp'),
+    path('singproduct/<int:id>',views.singproduct,name='singproduct'),
+    path('singproduct/cartaddjs/<int:id>/', views.cartaddjs, name='cartaddjs'),
     
     
 ]

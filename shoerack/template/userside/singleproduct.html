@@ -56,20 +56,20 @@
 					
 					<div class="p-r-50 p-t-5 p-lr-0-lg">
 						<h4 class="mtext-105 cl2 js-name-detail p-b-14">
-							{{product.name}}
+							{{data.product.name}}
 						</h4>
 
 						<span class="mtext-106 cl2">
-						$<span id="priceDisplay">{{ product.productsize.first.price }}</span>
+						$<span id="priceDisplay">{{ data.price }}</span>
 						</span>
 							
 						<p class="stext-102 cl3 p-t-23">
-						{{product.productsize.first.description}}
+						{{data.description}}
 						</p>
 					
 						
 						<p class="stext-102 cl3 p-t-23">
-							color: {{product.color}}
+							color: {{data.product.color}}
 						</p>
 					
 						<!--  -->
@@ -93,12 +93,12 @@
 								</div> -->
 
 								<div class="size-204 respon6-next">
-									<select  style="display: block; width: 38%; padding: 12px; font-size: 16px; line-height: 1.5; color: #555; background-color: #fff; background-clip: padding-box; border: 1px solid #ccc; border-radius: 4px; transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;"
-											name="time" id="sizeSelect">
-										{% for size in product.productsize.all %}
-											<option value={{size.size}}>{{size.size}}</option>
-										{% endfor %}
-									</select>
+									<select style="display: block; width: 38%; padding: 12px; font-size: 16px; line-height: 1.5; color: #555; background-color: #fff; background-clip: padding-box; border: 1px solid #ccc; border-radius: 4px; transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;"
+									name="time" id="sizeSelect">
+								{% for size in psize %}
+									<option value="{{ size.id }}">{{ size.size }}</option>
+								{% endfor %}
+							</select>
 								
 								</div>
 							
@@ -106,7 +106,7 @@
 
 						
 
-						 {% if  product.productsize.first.stock > 1 %}
+						 {% if  data.stock > 1 %}
 							
 							<div class="flex-w flex-r-m p-b-10">
 								
@@ -128,13 +128,15 @@
 										</div>
 									</div>
 								                               
-								<button class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 " >
-										<a  style="color:aliceblue" href="{% url 'add_to_cart' product.productsize.first.id %}"> 
+								<!-- <button class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 " >
+										<a  style="color:aliceblue" href="{% url 'add_to_cart' data.id %}"> 
 										Add to cart
 										</a>
 										
+									</button>  -->
 									
-									</button>  
+									<button class="addToCartBtn btn btn-dark add-to-cart flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 js-addcart-detail" data-product-id="{{ data.id }}" id="addToCartBtn">Add to Basket</button>
+									
 									
 									
 							
@@ -401,7 +403,7 @@
 				<div class="row isotope-grid">
 					
 					{% for p in products  %}
-					<a href="{% url 'product_detail' p.id%}">
+					<a href="{% url 'singproduct' p.productsize.first.id%}">
 					<div class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item women">
 						<!-- Block2 -->
 						<div class="block2"> 
@@ -465,6 +467,23 @@
  
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- <script>
+	document.getElementById("sizeSelect").addEventListener("change", function() {
+		var selectedValue = this.value;  // Get the selected size.id
+		if (selectedValue) {
+			// Create a link using the selected size.id
+			var link = document.createElement("a");
+			link.href = "/your-link-base/" + selectedValue;  // Replace with your link base URL
+			link.innerText = "Go to Size " + selectedValue;
+			
+			// Replace the existing content with the new link
+			var selectContainer = this.parentElement;
+			selectContainer.innerHTML = "";  // Clear the container
+			selectContainer.appendChild(link);
+		}
+	});
+	</script> -->
 <script>
     $(document).ready(function() {
         const sizeSelect = document.getElementById('sizeSelect');
@@ -512,7 +531,41 @@
         });
     });
 </script> 
-
+<script>
+	
+	document.addEventListener('DOMContentLoaded', function() {
+		var modal = document.getElementById("myModal");
+		var addToCartButtons = document.querySelectorAll(".addToCartBtn"); // Select all buttons with class "addToCartBtn"
+		var span = document.querySelector(".close");
+	
+		// Loop through each "Add to Cart" button
+		addToCartButtons.forEach(function(btn) {
+			btn.onclick = function() {
+				// Get the productId from the data attribute of the clicked button
+				var productId = btn.getAttribute('data-product-id');
+				console.log(productId);
+				// Make an AJAX request
+				var xhr = new XMLHttpRequest();
+				var url = "cartaddjs/" + productId + "/";
+				xhr.open('GET', url, true);
+                console.log("Constructed URL:", url);
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+						modal.style.display = "block";
+					}
+				};
+				xhr.send();
+			};
+		});
+	
+	
+		window.onclick = function(event) {
+			if (event.target == modal) {
+				modal.style.display = "none";
+			}
+		};
+	});
+</script>
 
 
 	

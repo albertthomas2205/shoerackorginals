@@ -1,226 +1,47 @@
 {% extends 'profile/profilebase.html' %}
 {% load static %}
-{% block content  %}
-<section class=" " >
-    
-  <div class="row d-flex justify-content-center align-items-center">
-    <div class="col-lg-10 col-xl-8">
-      <div class="card" >
-        {% if page_orders %}
-        <div class="card-header px-3 py-5">
-            <h5 class="text-muted mb-0">Thanks for your Order, <span style="color:black;"> {{cust.name}}</span>!</h5>
-          </div>
-        {% for order in page_orders %}
-        <div class="card-body ">
-          
-         
-        
 
-          
-    
-          {% for item in order.items.all %}
-          
-          <div class="card shadow-0 border ">
-            
-            <div class="card-body">
-              <div class ="" style="background-color: rgba(255, 255, 255, 0.19); padding: 0px;">
-                {% if order.status != 'C' %}
-                <div class="fw-normal d-grid gap-2 d-md-flex justify-content-md-end">
-                <a href="{% url 'usercancel' id=order.id %}"><button type="button" class="btn btn-danger btn-sm">Cancel order</button></a>
-            </div>{% else %}{% endif %}
-              
-              <div class="row">
-                <div class="col-md-2">
-                  <img src="{{item.product.product.images.first.image.url }}"
-                    class="img-fluid" alt="Phone">
-                </div>
-                <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
-                  <p class="text-muted mb-0"> {{item.product.product.name}} </p>
-                </div>
-                <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
-                  <p class="text-muted mb-0 small">{{item.product.color}} </p>
-                </div>
-                <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
-                  <p class="text-muted mb-0 small">{{order.get_status_display}}</p>
-                </div>
-                <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
-                  <p class="text-muted mb-0 small">{{item.quantity}}</p>
-                </div>
-                <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
-                  <p class="text-muted mb-0 small">₹{{item.total_itemprice}}</p>
-                </div>
-              </div>
-              
-              <!-- <hr class="mb-4" style="background-color: #e0e0e0; opacity: 1;"> -->
-              <div class="row d-flex align-items-center">
+<!-- {% block st %}
+<link rel="stylesheet" href="{% static '/css/styles.min.css' %}">
+  {% endblock  %} -->
+
+{% block content %}
+<br><br><br><br><br>
+<div class="row">
+  <div class="col-lg-12 p-5 bg-white rounded shadow-sm mb-5">
+
+    <h3>Orders</h3>
+    <div class="table-responsive">
+      <table class="table">
+      
+        <tbody>
+          {% for order in page_orders %} <div style="border-radius: 3px; border-color:black;">
+          <tr >
+            <th scope="row" class="border-0" >
+              <div class="p-2" style="  margin-bottom: 20px;">
+
+                {% for order_item in order.items.all %}
+    <img src="{{ order_item.product.product.images.first.image.url }}" alt="" width="70" class="img-fluid rounded shadow-sm">
+{% endfor %}
+                <div class="ml-3 d-inline-block align-middle">
+                 
+                  <h5 class="mb-0"> <a href="#" class="text-dark d-inline-block align-middle"> {{order.address.custom_name}}</a></h5><span class="text-muted font-weight-normal font-italic d-block">Destination:{{order.address.pincode}}</span>
                
-
-
-                {% if order.status == 'P' %}
-                <div class="col-md-2">
-                    <p class="text-muted mb-0 small">Track Order</p>
-                  </div>
-                <div class="col-md-10">
-                  <div class="progress" style="height: 6px; border-radius: 16px;">
-                    <div class="progress-bar" role="progressbar"
-                      style="width: 10%; border-radius: 16px; background-color: skyblue;" aria-valuenow="65"
-                      aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                  <div class="d-flex justify-content-around mb-1">
-                    <p class="text-muted mt-1 mb-0 small ms-xl-5"></p>
-                    <p class="text-muted mt-1 mb-0 small ms-xl-5">{{order.get_status_display}}</p>
-                  </div>
-                </div>
+                </div></div>
               
-                <div class="d-flex justify-content-between pt-2">
-                    <p class="fw-bold mb-0">Order Details</p>
-
-                    <p class="text-muted mb-0"><span class="fw-bold me-4"></span>{{order.total_amount}}</p>
-                  </div>
-      
-                  <!-- <div class="d-flex justify-content-between pt-2">
-                    <p class="text-muted mb-0">Invoice Number : 788152</p>
-                    <p class="text-muted mb-0"><span class="fw-bold me-4">Discount</span> $19.00</p>
-                  </div>
-      
-                  <div class="d-flex justify-content-between">
-                    <p class="text-muted mb-0">Invoice Date : 22 Dec,2019</p>
-                    <p class="text-muted mb-0"><span class="fw-bold me-4">GST 18%</span> 123</p>
-                  </div>
-                  <div class="d-flex justify-content-between mb-5">
-                    <p class="text-muted mb-0">Recepits Voucher : 18KU-62IIK</p>
-                    <p class="text-muted mb-0"><span class="fw-bold me-4">Delivery Charges</span> Free</p>
-                  </div> -->
-
-                {% elif order.status == 'S' %}
-                <div class="col-md-2">
-                    <p class="text-muted mb-0 small">Track Order</p>
-                  </div>
-                <div class="col-md-10">
-                  <div class="progress" style="height: 6px; border-radius: 16px;">
-                    <div class="progress-bar" role="progressbar"
-                      style="width: 75%; border-radius: 16px; background-color: rgb(147, 235, 135);" aria-valuenow="65"
-                      aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                  <div class="d-flex justify-content-around mb-1">
-                    <p class="text-muted mt-1 mb-0 small ms-xl-5"></p>
-                    <p class="text-muted mt-1 mb-0 small ms-xl-5">{{order.get_status_display}}</p>
-                  </div>
-                </div>
-                <div class="d-flex justify-content-between pt-2">
-                    <p class="fw-bold mb-0">Order Details</p>
-                    <p class="text-muted mb-0"><span class="fw-bold me-4"></span>{{order.items.total_amount}}</p>
-                  </div>
-<!--           
-                  <div class="d-flex justify-content-between pt-2">
-                    <p class="text-muted mb-0">Invoice Number : 788152</p>
-                    <p class="text-muted mb-0"><span class="fw-bold me-4">Discount</span> $19.00</p>
-                  </div>
-      
-                  <div class="d-flex justify-content-between">
-                    <p class="text-muted mb-0">Invoice Date : 22 Dec,2019</p>
-                    <p class="text-muted mb-0"><span class="fw-bold me-4">GST 18%</span> 123</p>
-                  </div> -->
-      
-                  <!-- <div class="d-flex justify-content-between mb-5">
-                    <p class="text-muted mb-0">Recepits Voucher : 18KU-62IIK</p>
-                    <p class="text-muted mb-0"><span class="fw-bold me-4">Delivery Charges</span> Free</p>
-                  </div> -->
-                {% elif order.status == 'D' %}
-                <div class="col-md-2">
-                    <p class="text-muted mb-0 small">Track Order</p>
-                  </div>
-                <div class="col-md-10">
-                  <div class="progress" style="height: 6px; border-radius: 16px;">
-                    <div class="progress-bar" role="progressbar"
-                      style="width: 100%; border-radius: 16px; background-color: green;" aria-valuenow="65"
-                      aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                  <div class="d-flex justify-content-around mb-1">
-                    <p class="text-muted mt-1 mb-0 small ms-xl-5"></p>
-                    <p class="text-muted mt-1 mb-0 small ms-xl-5">{{order.get_status_display}}</p>
-                  </div>
-                </div>
-                <div class="d-flex justify-content-between pt-2">
-                    <p class="fw-bold mb-0">Order Details</p>
-                    <p class="text-muted mb-0"><span class="fw-bold me-4">Total</span>₹{{order.total_price}}</p>
-                  </div>
-      
-                  <!-- <div class="d-flex justify-content-between pt-2">
-                    <p class="text-muted mb-0">Invoice Number : 788152</p>
-                    <p class="text-muted mb-0"><span class="fw-bold me-4">Discount</span> $19.00</p>
-                  </div> -->
-      
-                  <!-- <div class="d-flex justify-content-between">
-                    <p class="text-muted mb-0">Invoice Date : 22 Dec,2019</p>
-                    <p class="text-muted mb-0"><span class="fw-bold me-4">GST 18%</span> 123</p>
-                  </div> -->
-      
-                  <!-- <div class="d-flex justify-content-between mb-5">
-                    <p class="text-muted mb-0">Recepits Voucher : 18KU-62IIK</p>
-                    <p class="text-muted mb-0"><span class="fw-bold me-4">Delivery Charges</span> Free</p>
-                  </div> -->
-                {% else %}
-              
-             
-                    <div class="prog"  >
-                    <h6 class="text" style="color: white; background-color: red;"> {{order.get_status_display}}</h6>
-                    </div>
-                {% endif %}
-
-              </div>
-            </div>
-          </div>{% endfor %}
-          
-        </div>
+            </th>
+            <td class="border-0 align-middle"><strong>₹{{order.total_price}}</strong></td>
+            <td class="border-0 align-middle"><strong>Nos:{{order.items.count}}</strong></td>
+            <td class="border-0 align-middle"> <a href="{% url 'order_deatails' id=order.id %}"><button type="button" class="btn btn-secondary btn-sm">See ordered items</button></td></a>
         
-          
-    </div>
-          {% endfor %}{% else %}<h6>You have no orders yet!</h6>{% endif %}
-          {% comment %} <div class="card-footer border-0 px-4 py-5"
-          style="background-color: #a8729a; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
-          <h5 class="d-flex align-items-center justify-content-end text-white text-uppercase mb-0">Total
-            paid: <span class="h2 mb-0 ms-2">$1040</span></h5>
-        </div> {% endcomment %}
-
-
-      <div class="pagination justify-content-center">
-        <ul class="pagination">
-          <!-- Previous link -->
-          {% if  page_orders.has_previous %}
-            <li class="page-item">
-              <a class="page-link" href="?page={{  page_orders.previous_page_number }}" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-              </a>
-            </li>
-          {% endif %}
-      
-          <!-- Page numbers -->
-          {% for page in  page_orders.paginator.page_range %}
-            <li class="page-item {% if  page_orders.number == page %}active{% endif %}">
-              <a class="page-link" href="?page={{ page }}">{{ page }}</a>
-            </li>
+          </tr></div>
           {% endfor %}
-      
-          <!-- Next link -->
-          {% if  page_orders.has_next %}
-            <li class="page-item">
-              <a class="page-link" href="?page={{ page_orders.next_page_number }}" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-              </a>
-            </li>
-          {% endif %}
-        </ul>
-      </div>
-      
-        
-      </div>
-     
+        </tbody>
+      </table>
     </div>
+    <!-- End -->
   </div>
- 
 </div>
-</section>
 
 
 
@@ -230,3 +51,7 @@
 
 
 {% endblock  %}
+
+
+
+

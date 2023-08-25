@@ -9,11 +9,14 @@ from .models import Category,Product,ProductImage,Brand
 from django.shortcuts import render, redirect
 from .models import Category
 from .forms import ProductForm, ProductImageForm,Productsize,ProductsizeForm
-from account.models import Order
+from account.models import Order,OrderItem,Userdetails
 from decimal import Decimal
 from datetime import datetime
 from django.db.models import Q
 from django.core.exceptions import ValidationError
+from django.shortcuts import render, redirect
+from cart.models import Coupon
+from account.models import OrderReturn,Wallet,Wallethistory
 
 
 
@@ -290,30 +293,76 @@ def delete_product (request, id):
     
 
 
+
+# def Orders(request):
+    
+#     all_orders = Order.objects.all()
+#     per_page = 3
+#     paginator = Paginator(all_orders, per_page)
+#     page_number = request.GET.get('page')
+#     page_obj = paginator.get_page(page_number)
+#     context = {
+#         'page_obj': page_obj,
+#     }
+
+#     return render(request, 'admin_panel/ordermanagement.html', context)
 def Orders(request):
-    
-    all_orders = Order.objects.all()
-    per_page = 3
-    paginator = Paginator(all_orders, per_page)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    orders = Order.objects.all().order_by("-created_at")
+    paginator = Paginator(orders, per_page=3)
+
+    page_number = request.GET.get("page")
+    page = paginator.get_page(page_number)
     context = {
-        'page_obj': page_obj,
+        "orders": page,
     }
+    return render(request, "admin_panel/ordermanagement.html", context)
+def adminorder_deatails(request, id):
+    order = Order.objects.get(id=id)
+    order_items = OrderItem.objects.filter(order=order)
+    try:
+        x = Decimal(order.coupon_applied.discount)
+        sub_price = order.total_price + x
+    except:
+        sub_price = order.total_price
+    address = Userdetails.objects.get(id=order.address.id)
+    context = {
+        "order_items": order_items,
+        "order": order,
+        "sub_price": sub_price,
+        "address": address,
+    }
+    return render(request, "admin_panel/uniqueorder.html", context)
 
-    return render(request, 'admin_panel/ordermanagement.html', context)
+def order_cancel(request, id):
+    edit = OrderItem.objects.get(id=id)
+    edit.status = "C"
+    edit.save()
+    id = edit.order.id
+    return redirect("adminorder_deatails", id)
 
-def update_order_status(request,id):
-    if request.method=='POST':
-        st=request.POST.get('status')
-        edit=Order.objects.get(id=id)
-        edit.status=st
-        edit.save()
-        return redirect('ordermanagement')
+# def update_order_status(request,id):
+#     if request.method=='POST':
+#         st=request.POST.get('status')
+#         edit=Order.objects.get(id=id)
+#         edit.status=st
+#         edit.save()
+#         return redirect('ordermanagement')
     
-from datetime import datetime
-from django.shortcuts import render, redirect
-from cart.models import Coupon
+
+def update_order_status(request, id):
+    if request.method == "POST":
+        st = request.POST.get("status")
+        edit = OrderItem.objects.get(id=id)
+        edit.status = st
+        edit.save()
+        id = edit.order.id
+        print(edit.order.address.custom_name)
+      
+        return redirect("adminorder_deatails", id)
+
+
+    
+    
 
 
 # def Admincoupon(request):
@@ -371,6 +420,44 @@ def Admincoupon(request):
             return render(request, "admin_panel/coupons.html", {"datas": datas, "error_message": error_message})
     datas = Coupon.objects.all()
     return render(request, "admin_panel/coupons.html", {"datas": datas})
+
+
+
+def Returns(request):
+    returns = OrderReturn.objects.all().order_by('-created_at')
+    paginator = Paginator(returns, per_page=3)
+    page_number = request.GET.get("page")
+    page = paginator.get_page(page_number)
+    context = {'returns': page}
+    return render(request,'admin_panel/return.html', context)
+
+
+def returndetails(request,id):
+    item = OrderReturn.objects.get(id=id)
+    context = {'item':item}
+    return render(request,'admin_panel/returndetails.html', context)
+
+def update_return_status(request,id):
+    if request.method == "POST":
+        st = request.POST.get("status")
+        edit = OrderReturn.objects.get(id=id)
+        edit.status = st
+        edit.save()
+        tt = edit.total_price
+     
+            
+        if edit.status == 'R':
+            try:
+                 wallet = Wallet.objects.get(user=edit.user)
+            except:
+                wallet = Wallet.objects.create(user= edit.user)
+            wallet = Wallet.objects.get(user=edit.user)
+            total_coins=wallet.coins
+            total_coins += tt
+            wallet.coins = total_coins
+            wallet.save()
+            Wallethistory.objects.create(task=f"Product return {edit.orderitem.product.product.name}",wallet=wallet,coins=edit.total_price)
+        return redirect('returndetails',id)
 
 
 
