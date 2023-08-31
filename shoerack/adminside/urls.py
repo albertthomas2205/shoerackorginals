@@ -30,6 +30,6 @@ urlpatterns = [
     path('returns', views.Returns, name='returns'),
     path('returndetails/<int:id>/', views.returndetails, name='returndetails'),
     path('update_return_status/<int:id>/', views.update_return_status, name='update_return_status'),
-
+    path('admindashboard',views.AdminDashboard,name='admindashboard'),
 
 ]

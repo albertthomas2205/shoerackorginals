@@ -13,16 +13,37 @@ from decimal import Decimal
 
 
 
-# Create your views here.
+# # Create your views here.
+# def profilehome(request):
+#     addresses = request.user
+
+#     try:
+#         wallet = Wallet.objects.get(user_id= request.user.id)
+#         wallethistory = Wallethistory.objects.filter(wallet=wallet).order_by('-created_at')
+#     except:
+#         wallet = Wallet.objects.create(user=  request.user)
+#         wallethistory = None
+        
+#     return render(request,'profile/profilehome.html',{'addresses':addresses ,'wallethistory':wallethistory ,'wallet':wallet})
+
 def profilehome(request):
-    addresses = request.user
-    id = Wallet.objects.get(user= request.user)
-    wallet=id
-    wallethistory = Wallethistory.objects.filter(wallet=id)
+    addresses= request.user
+    if request.method == "POST":
+        
+        user = get_object_or_404(CustomUser, user=request.user)
+       
+        id = user.id
     
+      
+    d = request.user
+
+    try:
+        wallet=Wallet.objects.get(user=d)
+        wallethistory=Wallethistory.objects.filter(wallet=wallet).order_by('-created_at')
+    except:
+        wallet=Wallet.objects.create(user=d)
+        wallethistory=None
     return render(request,'profile/profilehome.html',{'addresses':addresses ,'wallethistory':wallethistory ,'wallet':wallet})
-
-
 def viewaddress(request):
     # Retrieve the logged-in user's details
     addresses = Userdetails.objects.filter(userr=request.user)
@@ -71,30 +92,11 @@ def editaddress(request, userdetails_id):
     context = {'form': form}
     return render(request, 'profile/editaddress.html', context)
 
-# def userorders(request):
-#     cust = get_object_or_404(CustomUser, id=request.user.id)
-#     orders=Order.objects.filter(user=cust)
-    
-#     context={'orders':orders,'cust':cust}
-#     return render(request,'profile/orders.html',context)
 
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
 
-# def userorders(request):
-#     cust = get_object_or_404(CustomUser, id=request.user.id)
-#     orders = Order.objects.filter(user=cust)
 
-#     # Number of items to show per page
-#     items_per_page = 2  # You can adjust this number as per your preference
-
-#     paginator = Paginator(orders, items_per_page)
-    
-#     page_number = request.GET.get('page')
-#     page_orders = paginator.get_page(page_number)
-    
-#     context = {'page_orders': page_orders, 'cust': cust}
-#     return render(request, 'profile/orders.html', context)
 
 
 def userorders(request):
@@ -102,7 +104,7 @@ def userorders(request):
     orders = Order.objects.filter(user=cust).order_by('-created_at')
 
     # Number of items to show per page
-    items_per_page = 2  # You can adjust this number as per your preference
+    items_per_page = 3 # You can adjust this number as per your preference
 
     paginator = Paginator(orders, items_per_page)
     
@@ -228,5 +230,9 @@ def product_return(request,id):
         OrderReturn.objects.create(orderitem=orderitem,user=request.user,total_price=total_price)
         id = orderitem.order.id
     return redirect('order_deatails',id)
+
+def basee(request):
+    return render(request,'profile/base.html')
+
 
         

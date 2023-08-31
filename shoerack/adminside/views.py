@@ -17,6 +17,39 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect
 from cart.models import Coupon
 from account.models import OrderReturn,Wallet,Wallethistory
+from datetime import date,timedelta
+from datetime import datetime, timedelta, timezone
+
+
+def AdminDashboard(request):
+    if request.method=='POST':
+        from_date_str=request.POST.get('from')
+        To_date_str=request.POST.get('to')
+        from_date = datetime.strptime(from_date_str, "%m/%d/%Y").strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+        to_date = datetime.strptime(To_date_str, "%m/%d/%Y").strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+    else: 
+        from_date = None
+        to_date = None
+    week_date = datetime.now(timezone.utc) - timedelta(days=7) 
+    month_date = datetime.now(timezone.utc) - timedelta(days=30)
+    end_date = datetime.now(timezone.utc)
+    weekly = Order.objects.filter(created_at__range=(week_date, end_date))
+    monthly = Order.objects.filter(created_at__range=(month_date, end_date))
+    total_week_amount=0
+    total_month_amount=0
+    for dates in weekly:
+        total_week_amount+=dates.total_price
+    for dates in monthly:
+        total_month_amount+=dates.total_price
+   
+    context={'weekly':weekly,'monthly':monthly,'total_week_amount':total_week_amount,'total_month_amount':total_month_amount}
+    
+    return render(request, "admin_panel/index.html",context)
+
 
 
 
@@ -458,6 +491,7 @@ def update_return_status(request,id):
             wallet.save()
             Wallethistory.objects.create(task=f"Product return {edit.orderitem.product.product.name}",wallet=wallet,coins=edit.total_price)
         return redirect('returndetails',id)
+    
 
 
 

@@ -9,26 +9,36 @@
   <title>ShoeRack</title>
   <link rel="shortcut icon" type="image/png" href="{% static 'static_admin/assets/images/logos/lgg.png' %}" />
   <link rel="stylesheet" href="{% static 'static_admin/assets/css/styles.min.css' %}" />
-  <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>z
-  <style>
-      #cropper-container {
-          max-width: 100%;
-      }
-  </style>
+  <link rel="stylesheet" href="{% static 'css/trackorder.css' %}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   {% block js %}{% endblock %}
-  {% block css %}{% endblock %}
+  {% block static %}{% endblock  %}
+  <style>
+    /* Custom CSS to make the section square at medium devices */
+    @media (min-width: 768px) {
+        .login_box_area {
+            min-height: 0;
+            padding-bottom: 0;
+            color:blueviolet
+        }
+    }
+</style>
 </head>
 
 
-<body>
+
+<body >
   <!--  Body Wrapper -->
   <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
-    data-sidebar-position="fixed" data-header-position="fixed">
+    data-sidebar-position="fixed" data-header-position="fixed" >
     <!-- Sidebar Start -->
-    <aside class="left-sidebar">
+    <aside class="left-sidebar" >
       <!-- Sidebar scroll-->
-      <div>
-        <div class="brand-logo d-flex align-items-center justify-content-between ">
+      <div style="color:crimson">
+        <div class="brand-logo d-flex align-items-center justify-content-between " style="color:crimson">
           <a href="./index.html" class="text-nowrap logo-img">
             <img src="{% static 'static_admin/assets/images/logos/lgg.png' %}" width="180" alt="" />
           </a>
@@ -37,80 +47,65 @@
           </div>
         </div>
         <!-- Sidebar navigation-->
-        <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
+        <div style="color:blue">
+        <nav class="sidebar-nav scroll-sidebar" data-simplebar="" style="color:crimson">
           <ul id="sidebarnav">
             <li class="nav-small-cap">
               <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">Home</span>
+              <a href="{% url 'index' %}"><span class="hide-menu">Home</span></a>
+              
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'admindashboard' %}" aria-expanded="false">
+                <a class="sidebar-link" href="{% url 'profilehome' %}" aria-expanded="false">
+                  <span>
+                    <i class="ti ti-user-plus"></i>
+                  </span>
+                  <span class="hide-menu">Profile</span>
+                </a>
+              </li>
+              <li class="nav-small-cap">
+                <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                <span class="hide-menu">Mangement</span>
+              </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'viewaddress' %}" aria-expanded="false">
                 <span>
                   <i class="ti ti-layout-dashboard"></i>
                 </span>
-                <span class="hide-menu">Dashboard</span>
-              </a>
-            </li>
-            <li class="nav-small-cap">
-              <i class="ti ti-dots nav-small-cap-icon"></i>
-              <span class="hide-menu">Mangement</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'user' %}" aria-expanded="false">
-                <span>
-                  <i class="ti ti-user-plus"></i>
-                </span>
-                <span class="hide-menu">Customer Details</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'category' %}" aria-expanded="">
-                <span>
-                  <i class="ti ti-user-plus"></i>
-                </span>
-                <span class="hide-menu">Category</span>
+                <span class="hide-menu">View Address</span>
               </a>
             </li>
           
+            
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'userorders' %}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-article"></i>
+                </span>
+                <span class="hide-menu">Orders</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'resetpassword' %}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-article"></i>
+                </span>
+                <span class="hide-menu">Reset Password</span>
+              </a>
+            </li>
            
-
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'product' %}" aria-expanded="false">
-                <span>
-                  <i class="ti ti-cards"></i>
-                </span>
-                <span class="hide-menu">Product </span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'ordermanagement' %}" aria-expanded="false">
-                <span>
-                  <i class="ti ti-cards"></i>
-                </span>
-                <span class="hide-menu">Order </span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'returns' %}" aria-expanded="false">
-                <span>
-                  <i class="ti ti-cards"></i>
-                </span>
-                <span class="hide-menu">Return</span>
-              </a>
-            </li>
-            
-            
-            
+        
           </ul>
          
         </nav>
+      </div>
         <!-- End Sidebar navigation -->
       </div>
       <!-- End Sidebar scroll-->
     </aside>
     <!--  Sidebar End -->
     <!--  Main wrapper -->
-    <div class="body-wrapper">
+    <div class="body-wrapper" style="color: blue;">
       <!--  Header Start -->
       <header class="app-header">
         <nav class="navbar navbar-expand-lg navbar-light">
@@ -129,7 +124,7 @@
           </ul>
           <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
             <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
-              <a href="{% url 'signout' %}" target="_blank" class="btn btn-primary">logout</a>
+              <a href="{% url 'signoutt' %}" target="_blank" class="btn btn-primary">logout</a>
               <li class="nav-item dropdown">
                 <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown"
                   aria-expanded="false">
@@ -149,7 +144,7 @@
                       <i class="ti ti-list-check fs-6"></i>
                       <p class="mb-0 fs-3">My Task</p>
                     </a>
-                    {% comment %} <a href="{% url 'signout' %}" class="btn btn-danger mx-3 mt-2 d-block">Logout</a> {% endcomment %}
+                    {% comment %} <a href="" class="btn btn-danger mx-3 mt-2 d-block">Logout</a> {% endcomment %}
                   </div>
                 </div>
               </li>
@@ -158,46 +153,35 @@
         </nav>
       </header>
       <!--  Header End -->
-      <div class="container-fluid">
-        <div class="card">
+    
+      <div class="container-fluid" style="background-color:rgb(52, 47, 47);color:black;" >
+        {% block content %}{% endblock  %}
+       
+       {% comment %} <div class="card" style"background:black">
+          <div class="card-body"style"background:black">
           
-            <h5 class="card-title fw-semibold mb-4"> {% block heading %}{% endblock  %}</h5>
-            <p class="mb-0"> {% block subheading %}{% endblock  %} </p>
-            <br>
-            
-            <div class="container mt-3">
-              <div class="row">
-                {% block content %}{% endblock  %}
-                
-            
-                          <div class="d-grid gap-2 col-md-2">
-                             
-                          </div>
-                     
-                  </div>
-              </div>
-          
-                   
-          
+           
           </div>
-        </div>
+        </div> {% endcomment %}
       </div>
-
+    </div>
+  </div>
       
    
   
 
-      
-      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
-{% comment %}   
+  
   <script src="{% static 'staic_admin/assets/libs/jquery/dist/jquery.min.js' %}"></script>
-  {% comment %} <script src="{% static 'static_admin/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script> 
+  <script src="{% static 'static_admin/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
   <script src="{% static 'static_admin/assets/js/sidebarmenu.js' %}"></script>
   <script src="{% static 'static_admin/assets/js/app.min.js' %}"></script>
-  <script src="{% static 'static_admin/assets/libs/simplebar/dist/simplebar.js' %}"></script> {% endcomment %}
+  <script src="{% static 'static_admin/assets/libs/simplebar/dist/simplebar.js' %}"></script>
 
-  {% comment %} <script>
+  {% block jss %}
+
+  {% endblock  %}
+
+  <script>
     window.addEventListener('DOMContentLoaded', function() {
       var table = document.getElementById('data-table');
       var rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
@@ -208,8 +192,9 @@
         serialNumberCell.textContent = (i + 1).toString();
       }
     });
-  </script> {% endcomment %}
-  {% block script %}{% endblock  %}
+  </script>
+
+
 </body>
 
 </html>

@@ -112,7 +112,7 @@ class CartItem(models.Model):
 
 class Wallet(models.Model):
     coins=models.PositiveIntegerField(default=0)
-    user=models.ForeignKey(CustomUser,on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, unique=True)
     def __str__(self):
         return str(self.user)
     
