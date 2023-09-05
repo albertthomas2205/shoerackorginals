@@ -14,13 +14,18 @@ from decimal import Decimal
 from datetime import datetime
 from django.db.models import Q
 from django.core.exceptions import ValidationError
-from django.shortcuts import render, redirect
+from django.http import HttpResponseBadRequest
 from cart.models import Coupon
 from account.models import OrderReturn,Wallet,Wallethistory
-from datetime import date,timedelta
-from datetime import datetime, timedelta, timezone
-
-
+from datetime import  date, datetime, timedelta, timezone
+from django.db.models.functions import TruncMonth
+from django.db.models import Count
+from django.core.serializers import serialize
+import json
+from django.db.models import Sum
+from django.db.models.functions import TruncDate, TruncYear, TruncWeek
+from django.http import JsonResponse
+\
 def AdminDashboard(request):
     if request.method=='POST':
         from_date_str=request.POST.get('from')
@@ -50,6 +55,141 @@ def AdminDashboard(request):
     
     return render(request, "admin_panel/index.html",context)
 
+def chart(request):
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=30)
+    monthly_sales = Order.objects.filter(created_at__range=(start_date, end_date)) \
+        .annotate(month=TruncMonth('created_at')) \
+        .values('month') \
+        .annotate(total_sales=Sum('total_price')) \
+        .order_by('month')
+
+    # sales = OrderItem.objects.exclude(order_status_choices='Cancelled')
+    monthly_sales_list = list(monthly_sales)
+    monthly_sales_json = json.dumps(monthly_sales_list, default=str)
+    context = {
+        'monthly_sales': monthly_sales_json,
+        # 'sales': sales,
+    }
+
+    return render(request, 'admin_panel/chart.html', context)
+
+def yearly(request):
+    yearly_order_data = Order.objects.annotate(year=TruncYear('created_at')).values(
+        'year').annotate(order_count=Count('id')).order_by('year')
+    labels = [item['year'].strftime('%Y') for item in yearly_order_data]
+    data = [item['order_count'] for item in yearly_order_data]
+    context = {
+        'labels': labels,
+        'data': data,
+    }
+    return render(request, 'admin/yearly_chart.html', context)
+
+def monthly(request):
+    monthly_order_data = Order.objects.annotate(month=TruncMonth('order_date')).values(
+        'month').annotate(order_count=Count('id')).order_by('month')
+    labels = [item['month'].strftime('%Y-%m') for item in monthly_order_data]
+    data = [item['order_count'] for item in monthly_order_data]
+    context = {
+        'labels': labels,
+        'data': data,
+    }
+    return render(request, 'admin/monthly_chart.html', context)
+
+def sales_report(request):
+    if request.method=='POST':
+        from_date_str=request.POST.get('from')
+        To_date_str=request.POST.get('to')
+        end_date = datetime.now(timezone.utc)
+        from_date = datetime.strptime(from_date_str, "%m/%d/%Y").strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+        to_date = datetime.strptime(To_date_str, "%m/%d/%Y").strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+    else: 
+        from_date = None
+        to_date = None
+    end_date = datetime.now(timezone.utc)
+    week_date = datetime.now(timezone.utc) - timedelta(days=7) 
+    order = Order.objects.filter(created_at__range=(week_date, end_date))
+    items = []
+    
+    for ord in order:
+        item = OrderItem.objects.filter(order=ord)
+        
+        for ite in item:
+            items.append(ite)
+    context = {
+        'order': order,
+        'items': items
+    }
+    return render(request, 'admin_panel/sales_report.html', context)
+
+
+def sales_monthly(request):
+    if request.method=='POST':
+        from_date_str=request.POST.get('from')
+        To_date_str=request.POST.get('to')
+        end_date = datetime.now(timezone.utc)
+        from_date = datetime.strptime(from_date_str, "%m/%d/%Y").strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+        to_date = datetime.strptime(To_date_str, "%m/%d/%Y").strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+    else: 
+        from_date = None
+        to_date = None
+    end_date = datetime.now(timezone.utc)
+    month_date = datetime.now(timezone.utc) - timedelta(days=30)
+    order = Order.objects.filter(created_at__range=(month_date, end_date))
+    items = []
+    
+    for ord in order:
+        item = OrderItem.objects.filter(order=ord)
+        
+        for ite in item:
+            items.append(ite)
+    context = {
+        'order': order,
+        'items': items
+    }
+    return render(request, 'admin_panel/sales_report.html', context)
+
+
+from datetime import datetime
+
+
+def sales_daily(request):
+    if request.method == 'POST':
+        from_date_str = request.POST.get('fromDate')
+        to_date_str = request.POST.get('toDate')
+        
+        # Parse the date strings using the correct format ('%Y-%m-%d')
+       
+        from_date = datetime.strptime(from_date_str, "%Y-%m-%d").strftime(
+             "%Y-%m-%d %H:%M:%S"
+        )
+        to_date = datetime.strptime(to_date_str, "%Y-%m-%d").strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+    else: 
+        from_date = None
+        to_date = None
+        
+    # Query the database to get orders within the specified date range
+    orders = Order.objects.filter(created_at__range=(from_date, to_date))
+    
+    # Retrieve all related items for the selected orders
+    items = OrderItem.objects.filter(order__in=orders)
+    
+    context = {
+        'order': orders,
+        'items': items
+    }
+    
+    return render(request, 'admin_panel/sales_report.html', context)
 
 
 

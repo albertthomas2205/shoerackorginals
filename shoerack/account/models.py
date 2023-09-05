@@ -33,6 +33,7 @@ class Userdetails(models.Model):
 class Order(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    order_id = models.PositiveIntegerField()
     address = models.ForeignKey(Userdetails,on_delete=models.DO_NOTHING)
     total_price=models.DecimalField(max_digits=10, decimal_places=2)
     razor_pay_order_id=models.CharField(max_length=100,null=True,blank=True)

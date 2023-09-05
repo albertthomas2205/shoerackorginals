@@ -1,4 +1,4 @@
-{% extends 'admin_panel/index.html' %}
+{% extends 'admin_panel/base.html' %}
 {% block script %}  
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
@@ -62,7 +62,7 @@
               <div class="p-2" style="  margin-bottom: 20px;">
 
               
-    <img src="{{ return.orderitem.product.productimage_set.first.image.url }}" alt="" width="70" class="img-fluid rounded shadow-sm">
+    <img src="{{return.orderitem.product.product.images.first.image.url}}" alt="" width="70" class="img-fluid rounded shadow-sm">
 
                 <div class="ml-3 d-inline-block align-middle">
                  

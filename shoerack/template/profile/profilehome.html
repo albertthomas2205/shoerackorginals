@@ -15,9 +15,16 @@
                       style="width: 150px; z-index: 1">
                    
                   </div>
-                  <div class="ms-3" style="margin-top: 130px;">
-                    <h5 style="color:aliceblue">{{addresses.name}}</h5>
-                    <p style="color:red"> Welcom to ShoeRack</p>
+                  <div class="ms-4" style="margin-top: 90px;">
+                    <h5 style="color:aliceblue">{{addresses.name}} </h5>
+                    <p>
+                      <a href="#editEmployeeModal" class="edit" data-toggle="modal" data-c-id="{{ addresses.id }}" > <i class="material-icons" style="color:hsl(212, 81%, 33%)" data-toggle="tooltip" title="Edit">Edit</i></a></p>
+                  
+                     <p style="color:red"> Welcom to ShoeRack </p>
+                              
+        
+                 
+                   
                   </div>
                 </div>
                 <div class="p-4 text-black" style="background-color: #f8f9fa;">
@@ -39,7 +46,6 @@
                 <div class="card-body">
                 <div class="card-body p-4 text-black">
                   <div class="mb-5">
-                  
                     <div class="p-4" style="background-color: #f8f9fa;">
                       <p class="font-italic mb-1">Email : {{addresses.email}}</p>
                       <p class="font-italic mb-1">Pone : {{addresses.phone_number}}</p>
@@ -102,7 +108,31 @@
       </div>
     
       </section>
-
+<!-- Edit Modal HTML -->
+<div id="editEmployeeModal" class="modal fade">
+  <div class="modal-dialog">
+      <div class="modal-content">
+        <form method="post" action="{% url 'edit_profile' addresses.id %}">
+      {% csrf_token %}
+      <div class="modal-header">						
+          <h4 class="modal-title">Edit Profile Name</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      </div>
+      <div class="modal-body">					
+          <div class="form-group">
+              <label for="category_name"> Name</label>
+              <input type="text" class="form-control" id="category_name" name="name" value="{{addresses.name}}" required>
+          </div>
+      </div>
+      <div class="modal-footer">
+          <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+          <input type="submit" class="btn btn-info" value="Save">
+      </div>
+  </form>
+  
+      </div>
+  </div>
+  </div>
  
 
 

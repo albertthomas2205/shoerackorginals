@@ -23,7 +23,7 @@ urlpatterns = [
     path('delete_product_size/<int:id>/', views.delete_product_size, name='delete_product_size'),
     path('editvarient/<int:id>/',views.editproductsize,name='editvarient'),
     path('deleteproduct/<int:id>/',views.delete_product,name='deleteproduct'),
-    path('admincoupon', views.Admincoupon, name='admincoupon'),
+    path('admincoupon/', views.Admincoupon, name='admincoupon'),
     path('ordermanagement',views.Orders,name='ordermanagement'),
     path('order_cancel/<int:id>/', views.order_cancel, name='order_cancel'),
     path('adminorder_deatails/<int:id>/', views.adminorder_deatails, name='adminorder_deatails'),
@@ -31,5 +31,12 @@ urlpatterns = [
     path('returndetails/<int:id>/', views.returndetails, name='returndetails'),
     path('update_return_status/<int:id>/', views.update_return_status, name='update_return_status'),
     path('admindashboard',views.AdminDashboard,name='admindashboard'),
-
+    
+    path('chart/',views.chart,name='chart'),
+    path('monthly/',views.sales_monthly,name='monthly'),
+    path('yearly',views.yearly,name='yearly'),
+    path('daily/',views.sales_daily,name='daily'),
+    path('sales_report/',views.sales_report,name='sales_report'),
+    
+    
 ]

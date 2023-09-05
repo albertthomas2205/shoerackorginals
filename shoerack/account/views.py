@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponse
 from django.shortcuts import render,redirect,get_object_or_404
 from adminside.forms import UserdetailsForm
 from django.core.mail import send_mail
@@ -9,46 +9,60 @@ from account.models import Userdetails,Wallethistory,Wallet
 from account.models import Order,OrderItem,OrderReturn
 from django.contrib.auth import authenticate
 from decimal import Decimal
+from datetime import datetime
+
     
-
-
-
-# # Create your views here.
-# def profilehome(request):
-#     addresses = request.user
-
-#     try:
-#         wallet = Wallet.objects.get(user_id= request.user.id)
-#         wallethistory = Wallethistory.objects.filter(wallet=wallet).order_by('-created_at')
-#     except:
-#         wallet = Wallet.objects.create(user=  request.user)
-#         wallethistory = None
-        
-#     return render(request,'profile/profilehome.html',{'addresses':addresses ,'wallethistory':wallethistory ,'wallet':wallet})
 
 def profilehome(request):
     addresses= request.user
-    if request.method == "POST":
+  
         
-        user = get_object_or_404(CustomUser, user=request.user)
-       
-        id = user.id
-    
-      
-    d = request.user
-
-    try:
-        wallet=Wallet.objects.get(user=d)
+    try:    
+        wallet=Wallet.objects.get(user=request.user)
         wallethistory=Wallethistory.objects.filter(wallet=wallet).order_by('-created_at')
+    
     except:
-        wallet=Wallet.objects.create(user=d)
-        wallethistory=None
-    return render(request,'profile/profilehome.html',{'addresses':addresses ,'wallethistory':wallethistory ,'wallet':wallet})
+        
+            wallet=Wallet.objects.create(user=request.user)
+            wallethistory=None
+        
+  
+    return render(request,'profile/profilehome.html',{'addresses':addresses ,'wallet':wallet,'wallethistory':wallethistory})
+# def edit_category(request, category_id):
+#     category = get_object_or_404(Category, id=category_id)
+
+#     if request.method == 'POST':
+#         # Process the form data submitted for editing
+#         category_name = request.POST['category_name']
+#         # Update the category object
+#         category.category_name = category_name
+#         category.save()
+#         return redirect('category')  # Replace 'category_list' with the URL name of the page displaying the category list
+
+#     # Render the template for editing the category
+#     return render(request, 'admin_panel/category.html', {'category': category})
+
+
+def edit_profile(request,id):
+    id = get_object_or_404(CustomUser,id=id)
+    print(id.name)
+    if request.method == 'POST':
+        newname= request.POST.get('name')
+        id.name = newname
+        id.save()
+        return redirect('profilehome')
+    wallet=Wallet.objects.get(user=request.user)
+    wallethistory=Wallethistory.objects.filter(wallet=wallet).order_by('-created_at')
+    addresses= request.user
+    return render(request,'profile/profilehome.html',{'addresses':addresses ,'wallet':wallet,'wallethistory':wallethistory})
+    
+
+
 def viewaddress(request):
     # Retrieve the logged-in user's details
     addresses = Userdetails.objects.filter(userr=request.user)
     # Pass the user_details object to the HTML template
-    return render(request, 'profile/viewadddress.html', {'addresses': addresses})
+    return render(request, 'profile/viewadddress.html', {'addresses': addresses,})
 
 def addaddress(request):
     if request.method == 'POST':
@@ -134,13 +148,22 @@ def Usercancel(request,id):
     edit.save()
     return redirect('userorders')
 
+
+    
 def userorder_cancel(request,id):
     edit=OrderItem.objects.get(id=id)
     edit.status='C'
     edit.save()
+    tt = edit.total_itemprice
+    wallet = Wallet.objects.get(user=request.user)
+    total_coins=wallet.coins
+    total_coins += tt
+    wallet.coins = total_coins 
+    wallet.save()
+    Wallethistory.objects.create(task=f"Product cancel {edit.product.product.name}",wallet=wallet,coins=edit.total_itemprice)
     id = edit.order.id
     return redirect('order_deatails',id)
-    
+
 def forgototp(request):
     if request.method == 'POST':
         user_otp = request.POST.get('otp')
@@ -196,10 +219,17 @@ def Resendotp(request):
 def resetpassword (request):
     if request.method =='POST':
         up = request.POST.get('password')
+        hased = make_password(up)
+        k = get_object_or_404(CustomUser,email=request.user.email)
+        h = authenticate(request,email=k.email,password=up)
+        if k.password == hased:
+            print('bibin')
+       
         np = request.POST.get('pass1')
         cp = request.POST.get('pass2')
-        user = authenticate(request,password=up)
-        if user is not None:
+        
+        if h is not None:
+            print('haiiiiii')
             if np == cp:
                 edit = request.user
                 hasedpassword = make_password(np)
@@ -207,9 +237,25 @@ def resetpassword (request):
                 edit.save()
                 key='3'
                 messages.error(request, f'password successfully changed ({key})')
-                return redirect('profilehome')
+                return redirect('loginn')
     return render(request,'profile/resetpassword.html')
+
+# for generating pdf invoice
+from io import BytesIO
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+import os
                 
+def render_to_pdf(template_src, context_dict={}):
+    template = get_template(template_src)
+    html  = template.render(context_dict)
+    result = BytesIO()
+    pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)#, link_callback=fetch_resources)
+    if not pdf.err:
+        return HttpResponse(result.getvalue(), content_type='application/pdf')
+    return None
+
 def product_return(request,id):
     orderitem=OrderItem.objects.get(id=id)
     orderitem.returnstatus = True
@@ -218,7 +264,7 @@ def product_return(request,id):
         c = orderitem.order.coupon_applied
         order = OrderItem.objects.filter(order=orderitem.order)
         count = order.count()
-        k = 15
+        k = 150
         first = c.discount//count
         fi = Decimal(first)
         total_price= orderitem.total_itemprice - fi + k
@@ -231,8 +277,58 @@ def product_return(request,id):
         id = orderitem.order.id
     return redirect('order_deatails',id)
 
-def basee(request):
-    return render(request,'profile/base.html')
 
+
+def render_to_pdf(template_path, context_dict):
+    template = get_template(template_path)
+    html = template.render(context_dict)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'filename="tails invoice.pdf"'
+
+    pisa_status = pisa.CreatePDF(
+        html, dest=response
+    )
+
+    if pisa_status.err:
+        return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response
+
+def generate_invoice(request,id):
+    order = Order.objects.get(id=id)
+    orderitems = OrderItem.objects.filter(order = order)
+    if order.coupon_applied:
+        t = order.total_price
+        c = order.coupon_applied.discount
+        c = Decimal(c)
+        total = t + c
+        print(total)
+    else:
+        total = order.total_price
+    context = {'order':order,'orderitems':orderitems ,'total':total}
+    pdf = render_to_pdf('profile/invoice.html', context)
+
+    # Set content type and headers for download
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="invoice.pdf"'
+
+    return response
+
+
+
+
+# def GenerateInvoice(request,id):
+#     try:
+#         order=Order.objects.get(id=id)
+#         order_item=OrderItem.objects.get(order=order)
+#         # print(order_item)
+#         context={
+#             'order':order,
+#             'order_item':order_item,
+#             'now': datetime.now()
+
+#         }
+#         return render(request,'profile/invoice.html',context)
+#     except Order.DoesNotExist:
+#         return redirect('index')
 
         

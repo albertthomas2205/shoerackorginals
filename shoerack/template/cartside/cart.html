@@ -84,9 +84,10 @@
                                     <div class="wrap-num-product flex-w m-l-auto m-r-0" style="width: 50px; height: 40px; display: inline-block; border: 1px solid #ccc; border-radius: 4px; background-color: #f7f7f7;">
 
                                         <div class="product-quantity" style="display: flex; align-items: center; padding: 0 8px;">
-                                            <input  onchange="maxlimit({{ item.quantity }},this)" type="number" name="quant" data-product-id="{{item.product.id}}" value="{{ item.quantity }}" min="1"  class="text-center quantity-input" style="width: 40px; height: 30px; padding: 0 8px; font-size: 14px; text-align: center; border: none; background-color: transparent; color: #333; outline: none;">
+                                            <input type="number" name="quant" data-product-id="{{item.product.id}}" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" class="text-center quantity-input" style="width: 40px; height: 30px; padding: 0 8px; font-size: 14px; text-align: center; border: none; background-color: transparent; color: #333; outline: none;">
                                         </div>
-                                    
+                                        <div id="alert-message" style="display: none; color: red;">Maximum stock exceeded!</div>
+                                        
                                     </div>
                                     
                                 </td>
@@ -251,25 +252,31 @@
 		
 {% endblock %} 
 {% block sample  %}
-<script>
-    function maxlimit( quantity ,target){
-        if (target.value>quantity){
 
-                    Toastify({
-        text: "Max limit exceed",
-        duration: 3000,
-        gravity: "bottom", // `top` or `bottom`
-        position: "center", // `left`, `center` or `right`
-        stopOnFocus: true, // Prevents dismissing of toast on hover
-        style: {
-            background: "#F00",
-        },
-     
-        }).showToast();
-        }
-        target.value = quantity;
-    }
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const quantityInput = document.querySelector('.quantity-input');
+        const maxStock = parseInt(quantityInput.getAttribute('max'));
+        const alertMessage = document.getElementById('alert-message');
+
+        quantityInput.addEventListener('input', function () {
+            const enteredQuantity = parseInt(quantityInput.value);
+
+            if (enteredQuantity > maxStock) {
+                alertMessage.style.display = 'block';
+            } else {
+                alertMessage.style.display = 'none';
+            }
+        });
+    });
 </script>
+
+
+
+
+
+
 
 <script>
 

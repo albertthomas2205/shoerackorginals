@@ -81,10 +81,23 @@
                     </td>
                     
                     <td>{{item.quantity}}</td>
+                  
+                    {% if  item.status == 'C' %}
+                    <td>  
+                    
+                     
+                    </td>
+                    
+                    {% else %}
                     <td>  <span class="badge badge-success" style="cursor: pointer;" data-toggle="modal" data-target="#modal{{ item.id }}">
-                        update status
+                    
+                      update status
+                    </td>
+                    {% endif %}
+                   <td>
                     </span><span class="badge badge-danger ml-2" style="cursor: pointer;" data-toggle="modal" data-target="#modalConfirmDelete{{ item.id }}">cancel</span>
                         </td>
+                     
                     <div class="modal fade" id="modal{{ item.id }}">
                         <div class="modal-dialog" role="document">
                           <div class="modal-content">
@@ -92,7 +105,11 @@
                               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                               </button>
+                           
+                              <h4 class="modal-title"></h4>
+                           
                               <h4 class="modal-title">Update Order status {{item.id}}</h4>
+                            
                             </div>
                             <div class="modal-body">
                       

@@ -18,6 +18,7 @@ from django.contrib import messages
 import razorpay
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
+import random
 
 
 
@@ -143,12 +144,12 @@ def apply_coupon(request):
             elif k > total_price:
                 
                 key = "2"
-                messages.error(request, f"invalid otp. ({key})")
+                messages.error(request, f"less than minimumamount. ({key})")
                 return redirect("cart")
                     
             elif coup.active == False:
                 key = "2"
-                messages.error(request, f"invalid otp. ({key})")
+                messages.error(request, f"invalid coupon. ({key})")
                 return redirect("cart")
                 
             else:
@@ -167,10 +168,6 @@ def apply_coupon(request):
                 messages.error(request, f"invalid coupon name. ({key})")
                 return redirect("cart")
                 
-        
-            
-  
-
 
 
 def thanku(request):
@@ -182,7 +179,7 @@ def checkout(request):
     address = Userdetails.objects.filter(userr=request.user).order_by("-created_at")
     cart = get_object_or_404(Cart, user=request.user)
     cart_items = CartItem.objects.filter(cart=cart)
-    k = 15
+    k = 150
     total_price = (
         int(sum((item.product.price * item.quantity for item in cart_items))) + k
     )
@@ -211,9 +208,6 @@ def checkout(request):
     return render(request, "cartside/checkout.html", context)
 
 
-
-
-
 def delete_cart_item(request, item_id):
     cart_item = get_object_or_404(CartItem, id=item_id)
 
@@ -225,19 +219,13 @@ def delete_cart_item(request, item_id):
 from django.http import HttpResponseForbidden
 
 
-
-
-
 def tril (request):
    
     product = Product.objects.get(id=2)
     context = {'product':product}
     return render(request,'cartside/tril.html',context)
 
-        
-# def product_detail_view(request, product_id):
-#     product = get_object_or_404(Product, pk=product_id)
-#     return render(request, 'cartside/tril.html', {'product': product})
+
 
 from django.http import JsonResponse
 from .models import Product, Productsize
@@ -277,53 +265,6 @@ def update_cart_quantity(request):
         return JsonResponse({'success': True, 'message': 'Quantity updated successfully.'})
     
     return JsonResponse({'success': False, 'message': 'Invalid request method.'})
-
-
-
-
-# def create_orders(request):
-#     cart = get_object_or_404(Cart, user=request.user)
-#     total_price = Decimal(0)
-#     add = request.session.get("selected_address")
-#     payment1 = request.session.get("pay-method")
-#     address = get_object_or_404(Userdetails, id=add)
-#     for cart_item in cart.items.all():
-#         total_price += cart_item.product.price * cart_item.quantity
-#     try:
-#         coup = get_object_or_404(Coupon, id=cart.coupon.id)
-#         dis = coup.discount
-#         di = Decimal(dis)
-#         total_price -= di
-#         order = Order.objects.create(
-#             user=request.user,
-#             address=address,
-#             total_price=total_price,
-#             payment_method=payment1,
-#             coupon_applied=coup,
-#         )
-#     except:
-#         order = Order.objects.create(
-#             user=request.user,
-#             address=address,
-#             total_price=total_price,
-#             payment_method=payment1,
-#         )
-#     for cart_item in cart.items.all():
-#         OrderItem.objects.create(
-#             order=order,
-#             product=cart_item.product,
-#             quantity=cart_item.quantity,
-#             total_itemprice=cart_item.product.price * cart_item.quantity,
-#         )
-#     for cart_item in cart.items.all():
-#         product = cart_item.product
-#         product.stock -= cart_item.quantity
-#         product.save()
-#     cart.items.all().delete()
-#     cart.coupon = None
-#     cart.save()
-#     return render(request, "cartside/thankyou.html")
-
 
 
 
@@ -382,6 +323,7 @@ def create_orders(request):
     add = request.session.get("selected_address")
     payment1 = 'COD'
     address = get_object_or_404(Userdetails, id=add)
+    order_id = str(random.randint(10000000, 99999999))
     for cart_item in cart.items.all():
         total_price += cart_item.product.price * cart_item.quantity
     try:
@@ -395,6 +337,7 @@ def create_orders(request):
             total_price=total_price,
             payment_method=payment1,
             coupon_applied=coup,
+            order_id=order_id
         )
     except:
         order = Order.objects.create(
@@ -402,6 +345,7 @@ def create_orders(request):
             address=address,
             total_price=total_price,
             payment_method=payment1,
+            order_id=order_id
         )
     for cart_item in cart.items.all():
         OrderItem.objects.create(
@@ -427,6 +371,7 @@ def create_order(request):
     add = request.session.get("selected_address")
     payment1 = request.session.get("pay-method")
     address = get_object_or_404(Userdetails, id=add)
+    order_id = str(random.randint(10000000, 99999999))
     for cart_item in cart.items.all():
         total_price += cart_item.product.price * cart_item.quantity
     try:
@@ -441,6 +386,7 @@ def create_order(request):
             total_price=total_price,
             payment_method=payment1,
             coupon_applied=coup,
+            order_id=order_id
         )
     except:
         total_price_float = float(total_price)
@@ -449,6 +395,7 @@ def create_order(request):
             address=address,
             total_price=total_price,
             payment_method=payment1,
+            order_id=order_id
         )
     client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
     payment = client.order.create(
@@ -478,21 +425,6 @@ def create_order(request):
     cart.save()
     return render(request, "cartside/thankyou.html")
 
-# @csrf_exempt
-# @require_POST
-# def add_to_cart(request):
-#     product_size_id = request.POST.get('product_size_id')
-#     selected_size = request.POST.get('selected_size')  # Get the selected size
-    
-#     try:
-#         product_size = Productsize.objects.get(id=product_size_id)
-
-        
-#         response_data = {'success': True, 'message': 'Product added to cart.'}
-#     except Productsize.DoesNotExist:
-#         response_data = {'success': False, 'message': 'Product size not found.'}
-    
-#     return JsonResponse(response_data)
 
 
 

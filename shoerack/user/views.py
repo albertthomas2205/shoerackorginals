@@ -12,7 +12,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .helpers import send_otp_phone
 from .models import CustomUser
-from account.models import CartItem,Cart
+from account.models import CartItem,Cart,Wallet,Wallethistory
 from cart.models import Wishlist
 
 
@@ -111,12 +111,6 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 
 
-# def product_detail_view(request, product_id):
-#     product = get_object_or_404(Product, pk=product_id)
-#     relatedproducts = Product.objects.filter(id = product_id)
-#     k=ProductImage.objects.filter(product=product)
-#     context = {'product': product,'k':k,'products':relatedproducts}
-#     return render(request, 'userside/singleproduct.html',context)
 
 def product_detail_view(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
