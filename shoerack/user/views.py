@@ -134,16 +134,25 @@ def singproduct(request, id):
     relatedproducts = Product.objects.filter(brand=current_brand).exclude(pk=id)
     psize = Productsize.objects.filter(product=product)
     k = ProductImage.objects.filter(product=product)
-    try:
-        w=Wishlist.objects.get(product=data)
-        context = {
+   
+    context = {
             "data": data,
             "k": k,
             "psize": psize,
-            'w':w
+            'products':relatedproducts
         }
-    except:
-        context = {
+        
+    return render(request, "userside/singleproduct.html", context)
+
+def productsize(request, id):
+    data = Productsize.objects.get(id=id)
+    product = Product.objects.get(productsize=data)
+    current_brand = product.brand
+    relatedproducts = Product.objects.filter(brand=current_brand).exclude(pk=id)
+    psize = Productsize.objects.filter(product=product)
+    k = ProductImage.objects.filter(product=product)
+   
+    context = {
             "data": data,
             "k": k,
             "psize": psize,

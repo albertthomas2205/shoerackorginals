@@ -19,7 +19,6 @@ urlpatterns = [
     path('order_deatails/<int:id>/',views.order_deatails,name='order_deatails'),
     path('userorder_cancel/<int:id>/', views.userorder_cancel, name='userorder_cancel'),
     path('product_return/<int:id>/', views.product_return, name='product_return'),
-    # path('generateinvoice/<int:pk>/', views.GenerateInvoice, name = 'generateinvoice'),
     path('edit_profile/<int:id>/', views.edit_profile, name='edit_profile'),
     path('generate_invoice/<int:id>/', views.generate_invoice, name='generate_invoice'),
 

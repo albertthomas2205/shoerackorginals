@@ -6,7 +6,7 @@ from adminside.models import Product,Productsize,ProductImage
 from cart.models import Usercoupon,Wishlist
 from django.contrib.auth.decorators import login_required
 from user.models import CustomUser
-from account.models import Userdetails
+from account.models import Userdetails,Wallet,Wallethistory
 from django.http import JsonResponse
 from django.utils import timezone
 from django.http import JsonResponse
@@ -180,11 +180,13 @@ def checkout(request):
     cart = get_object_or_404(Cart, user=request.user)
     cart_items = CartItem.objects.filter(cart=cart)
     k = 150
+    coins = cart.coin_discount
     total_price = (
         int(sum((item.product.price * item.quantity for item in cart_items))) + k
     )
 
-    subtotal = total_price
+    subtotal = total_price-k
+    total_price -= coins
     dis = 0
     if cart.coupon is not None:
         coup = get_object_or_404(Coupon, id=cart.coupon.id)
@@ -196,7 +198,15 @@ def checkout(request):
         {"amount": total_price * 100, "currency": "INR", "payment_capture": 1}
     )
     print(payment)
+    coin = Wallet.objects.get(user=request.user)
+    coin_available = coin.coins
+    cn = (total_price // 100) * 30
+    wallet = Wallet.objects.get(user=request.user)
+    if wallet.coins < cn:
+        cn = wallet.coins
+    request.session["coinss"] = cn
     context = {
+        "cart": cart,
         "addresses": address,
         "cart_items": cart_items,
         "total_price": total_price,
@@ -204,9 +214,21 @@ def checkout(request):
         "dis": dis,
         "subtotal": subtotal,
         "payment": payment,
+        "coin_available": coin_available,
+        "cn": cn,
     }
     return render(request, "cartside/checkout.html", context)
 
+
+def coin_add(request):
+    cn = request.session.get("coinss")
+    cart = get_object_or_404(Cart, user=request.user)
+    if cart.coin_discount > 0:
+        cart.coin_discount = 0
+    else:
+        cart.coin_discount = cn
+    cart.save()
+    return redirect("checkout")
 
 def delete_cart_item(request, item_id):
     cart_item = get_object_or_404(CartItem, id=item_id)
@@ -230,6 +252,7 @@ def tril (request):
 from django.http import JsonResponse
 from .models import Product, Productsize
 
+
 def update_price(request):
     if request.method == 'GET':
         product_id = request.GET.get('product')
@@ -241,9 +264,6 @@ def update_price(request):
         except (Product.DoesNotExist, Productsize.DoesNotExist):
             return JsonResponse({'error': 'Product or size not found'}, status=400)
         
-
-
-
 
 
 
@@ -321,11 +341,15 @@ def create_orders(request):
     cart = get_object_or_404(Cart, user=request.user)
     total_price = Decimal(0)
     add = request.session.get("selected_address")
-    payment1 = 'COD'
+    payment1 = 'Cod'
     address = get_object_or_404(Userdetails, id=add)
     order_id = str(random.randint(10000000, 99999999))
     for cart_item in cart.items.all():
         total_price += cart_item.product.price * cart_item.quantity
+    k = 150
+    total_price -= cart.coin_discount
+    total_price += k
+
     try:
         coup = get_object_or_404(Coupon, id=cart.coupon.id)
         dis = coup.discount
@@ -337,7 +361,8 @@ def create_orders(request):
             total_price=total_price,
             payment_method=payment1,
             coupon_applied=coup,
-            order_id=order_id
+            order_id=order_id,
+            coin_discount=cart.coin_discount,
         )
     except:
         order = Order.objects.create(
@@ -345,7 +370,8 @@ def create_orders(request):
             address=address,
             total_price=total_price,
             payment_method=payment1,
-            order_id=order_id
+            order_id=order_id,
+            coin_discount=cart.coin_discount,
         )
     for cart_item in cart.items.all():
         OrderItem.objects.create(
@@ -358,11 +384,20 @@ def create_orders(request):
         product = cart_item.product
         product.stock -= cart_item.quantity
         product.save()
-    message = "Order placed successfully"
+    message = "Order placed successfully"   
+    wallet = Wallet.objects.get(user=request.user)
+    j = cart.coin_discount
+    wallet.coins -= j
+    wallet.save()
+    if j != 0:
+        history = f"Coins Used for Order:{j}"
+        Wallethistory.objects.create(wallet=wallet, task=history, coins=j)
+
     cart.items.all().delete()
     cart.coupon = None
     cart.save()
     return render(request, "cartside/thankyou.html")
+
 
 @login_required
 def create_order(request):
@@ -374,6 +409,9 @@ def create_order(request):
     order_id = str(random.randint(10000000, 99999999))
     for cart_item in cart.items.all():
         total_price += cart_item.product.price * cart_item.quantity
+    k = 150
+    total_price -= cart.coin_discount
+    total_price += k
     try:
         coup = get_object_or_404(Coupon, id=cart.coupon.id)
         dis = coup.discount
@@ -386,7 +424,8 @@ def create_order(request):
             total_price=total_price,
             payment_method=payment1,
             coupon_applied=coup,
-            order_id=order_id
+            order_id=order_id,
+            coin_discount=cart.coin_discount,
         )
     except:
         total_price_float = float(total_price)
@@ -395,7 +434,8 @@ def create_order(request):
             address=address,
             total_price=total_price,
             payment_method=payment1,
-            order_id=order_id
+            order_id=order_id,
+            coin_discount=cart.coin_discount,
         )
     client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
     payment = client.order.create(
@@ -420,6 +460,14 @@ def create_order(request):
         product.stock -= cart_item.quantity
         product.save()
     message = "Order placed successfully"
+    wallet = Wallet.objects.get(user=request.user)
+    j = cart.coin_discount
+    wallet.coins -= j
+    wallet.save()
+    if j != 0:
+        history = f"Coins Used for Order:{j}"
+        Wallethistory.objects.create(wallet=wallet, task=history, coins=j)
+
     cart.items.all().delete()
     cart.coupon = None
     cart.save()

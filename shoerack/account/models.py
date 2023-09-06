@@ -41,6 +41,7 @@ class Order(models.Model):
     razor_pay_payment_signature=models.CharField(max_length=100,null=True,blank=True)
     slug  = models.CharField(max_length=200,null=True,blank=True)
     payment_method = models.CharField(max_length=20)
+    coin_discount = models.IntegerField(default=0)
     coupon_applied=models.ForeignKey(Coupon,on_delete=models.DO_NOTHING,null=True,blank=True)
     def __str__(self):
         return f"Order {self.pk} for {self.user.name}"
@@ -87,13 +88,16 @@ class Cart(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     coupon = models.ForeignKey(Coupon,on_delete=models.DO_NOTHING,null=True,blank=True )
-    def __str__(self):
-        return f"Cart for {self.user.name}"
+    coin_discount = models.IntegerField(default=0)
+    
     def get_total_amount(self):
         total_amount = 0
         for item in self.items.all():  # Accessing related CartItem objects using 'items' related_name
             total_amount += item.get_subtotal()
-        return total_amount
+        return self.total_amount
+    def __str__(self):
+        return f"Cart for {self.user.name}"
+    
 
  
     
@@ -138,7 +142,8 @@ class OrderReturn(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return str(self.user)
-    
+ 
+  
 
 
 

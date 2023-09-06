@@ -22,6 +22,7 @@ urlpatterns = [
     path('send_otp/',views.send_otp,name = 'send_otp'),
     path('verify_otp/',views.verify_otp, name = 'verify_otp'),
     path('singproduct/<int:id>',views.singproduct,name='singproduct'),
+    path('productsize/<int:id>',views.productsize,name='productsize'),
     path('singproduct/cartaddjs/<int:id>/', views.cartaddjs, name='cartaddjs'),
     
     

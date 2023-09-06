@@ -96,13 +96,18 @@
 									<select style="display: block; width: 38%; padding: 12px; font-size: 16px; line-height: 1.5; color: #555; background-color: #fff; background-clip: padding-box; border: 1px solid #ccc; border-radius: 4px; transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;"
 									name="time" id="sizeSelect">
 								{% for size in psize %}
-									<option value="{{ size.id }}">{{ size.size }}</option>
+								<option value="{{ size.id }}">{{ size.size }}</option>
 								{% endfor %}
-							</select>
 								
+							</select>
+		
+							
+							
 								</div>
+								
 							
 							</div>
+						
 
 						
 
@@ -401,9 +406,9 @@
 	
 	
 				<div class="row isotope-grid">
-					
+				
 					{% for p in products  %}
-					<a href="{% url 'singproduct' p.productsize.first.id%}">
+					<a href="{% url 'singproduct' p.productsize.first.id %}">
 					<div class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item women">
 						<!-- Block2 -->
 						<div class="block2"> 
@@ -411,8 +416,8 @@
 								<img src="{{ p.images.first.image.url}}" alt="IMG-PRODUCT">
 	
 								{% comment %} <a href="#" class="block2-btn flex-c-m stext-103 cl2 size-102 bg0 bor2 hov-btn1 p-lr-15 trans-04 js-show-modal1">
-									Quick View
-								</a> {% endcomment %}
+									Quick View {% endcomment %} 
+								</a> 
 							</div>
 	
 							<div class="block2-txt flex-w flex-t p-t-14">
@@ -445,7 +450,7 @@
 						</div>
 					</div>
 				</a>
-					{% endfor %}
+					{% endfor %} 
 			
 				</div>
 								
@@ -484,6 +489,22 @@
 		}
 	});
 	</script> -->
+
+
+		
+		
+		
+		
+		
+		
+		
+	<script>
+		function redirectToChange(imageId) {
+			// Use JavaScript to redirect to the specified URL using the imageId
+			const url = `{% url 'productsize' id=0 %}`.replace('0', imageId);
+			window.location.href = url;
+		}
+	</script>
 <script>
     $(document).ready(function() {
         const sizeSelect = document.getElementById('sizeSelect');

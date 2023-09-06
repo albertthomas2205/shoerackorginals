@@ -25,7 +25,7 @@ import json
 from django.db.models import Sum
 from django.db.models.functions import TruncDate, TruncYear, TruncWeek
 from django.http import JsonResponse
-\
+
 def AdminDashboard(request):
     if request.method=='POST':
         from_date_str=request.POST.get('from')
@@ -41,60 +41,30 @@ def AdminDashboard(request):
         to_date = None
     week_date = datetime.now(timezone.utc) - timedelta(days=7) 
     month_date = datetime.now(timezone.utc) - timedelta(days=30)
+    year_date = datetime.now(timezone.utc) - timedelta(days=365)
+    today = datetime.now(timezone.utc) - timedelta(days=1)
     end_date = datetime.now(timezone.utc)
     weekly = Order.objects.filter(created_at__range=(week_date, end_date))
     monthly = Order.objects.filter(created_at__range=(month_date, end_date))
+    yearly = Order.objects.filter(created_at__range=(year_date, end_date))
+    daily = Order.objects.filter(created_at__range=(today, end_date))
+    
     total_week_amount=0
     total_month_amount=0
+    total_year_amount=0
+    total_today_amount=0
     for dates in weekly:
         total_week_amount+=dates.total_price
     for dates in monthly:
         total_month_amount+=dates.total_price
-   
-    context={'weekly':weekly,'monthly':monthly,'total_week_amount':total_week_amount,'total_month_amount':total_month_amount}
+    for dates in yearly:
+        total_year_amount+=dates.total_price
+    for dates in daily:
+        total_today_amount+=dates.total_price
+    context={'weekly':weekly,'monthly':monthly,'total_week_amount':total_week_amount,
+             'total_month_amount':total_month_amount,'total_year_amount':total_year_amount,'total_today_amount':total_today_amount}
     
     return render(request, "admin_panel/index.html",context)
-
-def chart(request):
-    end_date = datetime.now()
-    start_date = end_date - timedelta(days=30)
-    monthly_sales = Order.objects.filter(created_at__range=(start_date, end_date)) \
-        .annotate(month=TruncMonth('created_at')) \
-        .values('month') \
-        .annotate(total_sales=Sum('total_price')) \
-        .order_by('month')
-
-    # sales = OrderItem.objects.exclude(order_status_choices='Cancelled')
-    monthly_sales_list = list(monthly_sales)
-    monthly_sales_json = json.dumps(monthly_sales_list, default=str)
-    context = {
-        'monthly_sales': monthly_sales_json,
-        # 'sales': sales,
-    }
-
-    return render(request, 'admin_panel/chart.html', context)
-
-def yearly(request):
-    yearly_order_data = Order.objects.annotate(year=TruncYear('created_at')).values(
-        'year').annotate(order_count=Count('id')).order_by('year')
-    labels = [item['year'].strftime('%Y') for item in yearly_order_data]
-    data = [item['order_count'] for item in yearly_order_data]
-    context = {
-        'labels': labels,
-        'data': data,
-    }
-    return render(request, 'admin/yearly_chart.html', context)
-
-def monthly(request):
-    monthly_order_data = Order.objects.annotate(month=TruncMonth('order_date')).values(
-        'month').annotate(order_count=Count('id')).order_by('month')
-    labels = [item['month'].strftime('%Y-%m') for item in monthly_order_data]
-    data = [item['order_count'] for item in monthly_order_data]
-    context = {
-        'labels': labels,
-        'data': data,
-    }
-    return render(request, 'admin/monthly_chart.html', context)
 
 def sales_report(request):
     if request.method=='POST':
@@ -192,6 +162,68 @@ def sales_daily(request):
     return render(request, 'admin_panel/sales_report.html', context)
 
 
+def sales_chart_daily(request):
+    today = datetime.today()
+    past_7_days = [today - timedelta(days=i) for i in range(20)]
+
+    day_labels = [day.strftime('%Y-%m-%d') for day in past_7_days]
+    sales_data = Order.objects.filter(created_at__date__in=[day.date() for day in past_7_days])
+
+    daily_sales = []
+    for day in past_7_days:
+        x = sales_data.filter(created_at__date=day.date()).aggregate(total=Sum('total_price'))['total']
+        day_sales = int(x) if x is not None else 0
+        daily_sales.append(day_sales)
+        print(x)
+        name= 'Daily Report'
+    context = {'name':name,'day_labels': day_labels, 'daily_sales': daily_sales}
+    return render(request, 'admin_panel/chart.html', context)
+
+def sales_chart_weekly(request):
+    today = datetime.now(timezone.utc)
+    past_weeks = [today - timedelta(weeks=i) for i in range(6, -1, -1)]
+
+    labels = [week.strftime('%Y-%m-%d') for week in past_weeks]
+    
+    weekly_sales = []
+    for week_start in past_weeks:
+        week_end = week_start + timedelta(days=6)
+        total_sales = Order.objects.filter(created_at__date__range=[week_start.date(), week_end.date()]).aggregate(total=Sum('total_price'))['total']
+        week_sales = int(total_sales) if total_sales is not None else 0
+        weekly_sales.append(week_sales)
+        print(week_sales)
+
+    context = {'name':'Weekly Report','day_labels': labels, 'daily_sales': weekly_sales}
+    return render(request, 'admin_panel/chart.html', context)
+
+def sales_chart_monthly(request):
+    current_date = datetime.now(timezone.utc)
+    current_year = current_date.year
+    current_month = current_date.month
+
+    monthly_sales = []
+    labels = []
+
+    for i in range(12, -1, -1):
+        # Calculate the year and month for each past month
+        year = current_year - (i // 12)
+        month = (current_month - (i % 12)) % 12 or 12
+
+        # Calculate the start and end dates for the current month
+        month_start = datetime(year, month, 1, tzinfo=timezone.utc)
+        month_end = (month_start + timedelta(days=32)).replace(day=1, microsecond=0, second=0, minute=0, hour=0) - timedelta(seconds=1)
+
+        labels.append(month_start.strftime('%Y-%m-%d'))
+
+        # Calculate the total sales for the current month
+        total_sales = Order.objects.filter(created_at__range=(month_start, month_end)).aggregate(total=Sum('total_price'))['total']
+        month_sales = int(total_sales) if total_sales is not None else 0
+        monthly_sales.append(month_sales)
+
+    context = {'name': 'Monthly Report', 'day_labels': labels, 'daily_sales': monthly_sales}
+    return render(request, 'admin_panel/chart.html', context)
+
+
 
 def signinn(request):
     return render(request,'account/signin.html')
@@ -259,8 +291,6 @@ def block_user_view(request,id):
     return redirect('user')
 
 
-def base(request):
-    return render(request,'admin_panel/base.html')
 
 
 
@@ -338,35 +368,6 @@ def addproduct(request):
     brand = Brand.objects.all()
     contex= {'category':category,'brand':brand}
     return render(request,'admin_panel/product.html',contex)
-
-
-
-
-
-def add_product(request):
-    if request.method == 'POST':
-        product_form = ProductForm(request.POST)
-        image_form = ProductImageForm(request.POST, request.FILES)
-        if product_form.is_valid() and image_form.is_valid():
-            product = product_form.save()
-            images = request.FILES.getlist('image')
-            for image in images:
-                ProductImage.objects.create(product=product, image=image)
-            return redirect('product_list')  # Replace 'product_list' with the URL name for the product list page
-    else:
-        product_form = ProductForm()
-        image_form = ProductImageForm()
-
-    # Get the available categories and subcategories from the database
-    categories = Category.objects.all()
-    brands = Brand.objects.all()
-
-    return render(request, 'admin_panel/add_product.html', {
-        'product_form': product_form,
-        'image_form': image_form,
-        'categories': categories,
-        'brands': brands,
-    })
 
 
 def productsize(request,id):
@@ -464,21 +465,6 @@ def delete_product (request, id):
         product.delete()
         return redirect('product')
     
-
-
-
-# def Orders(request):
-    
-#     all_orders = Order.objects.all()
-#     per_page = 3
-#     paginator = Paginator(all_orders, per_page)
-#     page_number = request.GET.get('page')
-#     page_obj = paginator.get_page(page_number)
-#     context = {
-#         'page_obj': page_obj,
-#     }
-
-#     return render(request, 'admin_panel/ordermanagement.html', context)
 def Orders(request):
     orders = Order.objects.all().order_by("-created_at")
     paginator = Paginator(orders, per_page=3)
@@ -513,13 +499,6 @@ def order_cancel(request, id):
     id = edit.order.id
     return redirect("adminorder_deatails", id)
 
-# def update_order_status(request,id):
-#     if request.method=='POST':
-#         st=request.POST.get('status')
-#         edit=Order.objects.get(id=id)
-#         edit.status=st
-#         edit.save()
-#         return redirect('ordermanagement')
     
 
 def update_order_status(request, id):
@@ -533,34 +512,6 @@ def update_order_status(request, id):
       
         return redirect("adminorder_deatails", id)
 
-
-    
-    
-
-
-# def Admincoupon(request):
-#     if request.method == "POST":
-#         code = request.POST.get("code")
-#         discount = request.POST.get("discount")
-#         minamount = request.POST.get("minamount")
-#         valid_from_str = request.POST.get("from")
-#         valid_to_str = request.POST.get("to")
-#         valid_from = datetime.strptime(valid_from_str, "%m/%d/%Y").strftime(
-#             "%Y-%m-%d %H:%M:%S"
-#         )
-#         valid_to = datetime.strptime(valid_to_str, "%m/%d/%Y").strftime(
-#             "%Y-%m-%d %H:%M:%S"
-#         )
-#         Coupon.objects.create(
-#             code=code,
-#             minimumamount=minamount,
-#             discount=discount,
-#             valid_from=valid_from,
-#             valid_to=valid_to,
-#         )
-#         return redirect("admincoupon")
-#     datas = Coupon.objects.all()
-#     return render(request, "admin_panel/coupons.html", {"datas": datas})
 
 
 def Admincoupon(request):

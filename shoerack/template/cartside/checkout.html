@@ -404,10 +404,19 @@
                     <div class="p-3 bg-light mb-3">
                         <h5 class="font-size-16 mb-0">Order Summary <span class="float-end ms-2"></span></h5>
                     </div>
-                    <div class=" bg-light rounded rounded-pill shadow-sm mb-3">
-                        <!-- <label for="button" style="color: black;">Apply coupon</label> -->
-                        
-                    </div>
+                    {% if cart.coin_discount > 1 %} <a href="coin_add">
+                        <input type="checkbox" id="discountCheckbox" name="discount" class="icheck" value="D" checked>
+                        <label for="discountCheckbox"><small>🪙{{cart.coin_discount}} applied</small></label>
+                    </a> {% else %}
+                    {% if coin_available < 3000 or subtotal < 3000 %}<small>Minimum coin and cart amount should be more than 3000 to apply coins.</small> {% else %}
+                    <small>Coins available  🪙{{coin_available}},you can get maximum off of 30%.</small><br>
+                  
+                    <a href="coin_add">
+                        <input type="checkbox" id="discountCheckbox" name="discount" class="icheck" value="D">
+                        <label for="discountCheckbox">Get discount of 🪙{{cn}}</label>
+                    </a>
+             
+             {% endif %}{% endif %}
                     <div class="table-responsive">
                         <table class="table table-centered mb-0 table-nowrap">
                             <thead>
@@ -448,7 +457,7 @@
                                         <h6 class="font-size-14 m-0">Shipping Charge :</h6>
                                     </td>
                                     <td>
-                                        ₹15
+                                        ₹150
                                     </td>
                                 </tr>
                                 <tr>
@@ -457,6 +466,14 @@
                                     </td>
                                     <td>
                                         -₹{{dis}}
+                                    </td>
+                                </tr> 
+                                <tr>
+                                    <td colspan="2">
+                                        <h6 class="font-size-14 m-0">Coin Discount :</h6>
+                                    </td>
+                                    <td>
+                                        -🪙{{cart.coin_discount}}
                                     </td>
                                 </tr>                              
                                     
