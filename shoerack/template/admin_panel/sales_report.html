@@ -192,7 +192,7 @@
     var data = [
       ['Sales Report'],
       ['Id', 'Product', 'Payment', 'Quantity', 'Price']
-      {% for order in order %}
+      {% for order in items %}
       , [{{ forloop.counter }}, '{{ order.product.product.name }}', '{{ order.order.payment_method }}', '{{ order.quantity }}', '{{ order.total_itemprice }}']
       {% endfor %}
     ];

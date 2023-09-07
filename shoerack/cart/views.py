@@ -3,10 +3,10 @@ from django.shortcuts import render,redirect,get_object_or_404
 # Create your views here.
 from account.models import Cart, CartItem,Coupon
 from adminside.models import Product,Productsize,ProductImage
-from cart.models import Usercoupon,Wishlist
+# from cart.models import Usercoupon,Wishlist
 from django.contrib.auth.decorators import login_required
 from user.models import CustomUser
-from account.models import Userdetails,Wallet,Wallethistory
+from account.models import Userdetails,Wallet,Wallethistory,Usercoupon
 from django.http import JsonResponse
 from django.utils import timezone
 from django.http import JsonResponse
@@ -118,8 +118,7 @@ def Removecoupon(request):
     usercoupon.delete()
     cart.coupon = None
     cart.save()
-    return redirect("cartdetail")
-
+    return redirect("cart")
 def apply_coupon(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
     cart_items = CartItem.objects.filter(cart=cart)
@@ -134,6 +133,7 @@ def apply_coupon(request):
         try:
             coup = Coupon.objects.get(code=code)
             k = coup.minimumamount
+            print(k)
             if Usercoupon.objects.filter(Q(coupon=coup) & Q(user=request.user)).exists():
                 key = "2"
                 messages.error(request, f"coupon alredy . ({key})")
@@ -141,7 +141,7 @@ def apply_coupon(request):
                 
                 
                 
-            elif k > total_price:
+            elif k>total_price:
                 
                 key = "2"
                 messages.error(request, f"less than minimumamount. ({key})")
@@ -160,13 +160,14 @@ def apply_coupon(request):
                 x = coup.discount
                 discount = Decimal(x)
                 total_price -= discount
-                key = "2"
-                messages.error(request, f"invalid otp. ({key})")
+                key = "3"
+                messages.error(request, f"Coupon applied successfully. ({key})")
                 return redirect("cart")
         except:
                 key = "2"
                 messages.error(request, f"invalid coupon name. ({key})")
                 return redirect("cart")
+                
                 
 
 
@@ -181,47 +182,62 @@ def checkout(request):
     cart_items = CartItem.objects.filter(cart=cart)
     k = 150
     coins = cart.coin_discount
+  
     total_price = (
         int(sum((item.product.price * item.quantity for item in cart_items))) + k
     )
+    try:
+        
+        b = cart.coupon.minimumamount
+        print(b,total_price)
+        if b>total_price:
+            cart = get_object_or_404(Cart, user=request.user)
+            usercoupon = Usercoupon.objects.get(Q(coupon=cart.coupon) & Q(user=request.user))
+            usercoupon.delete()
+            cart.coupon = None
+            cart.save()
+            return redirect("cart")
+    except:
+            subtotal = total_price-k
+            total_price -= coins
+            dis = 0
 
-    subtotal = total_price-k
-    total_price -= coins
-    dis = 0
-    if cart.coupon is not None:
-        coup = get_object_or_404(Coupon, id=cart.coupon.id)
-        dis = coup.discount
-        total_price -= dis
-    numitems = cart_items.count()
-    client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
-    payment = client.order.create(
-        {"amount": total_price * 100, "currency": "INR", "payment_capture": 1}
-    )
-    print(payment)
-    coin = Wallet.objects.get(user=request.user)
-    coin_available = coin.coins
-    cn = (total_price // 100) * 30
-    wallet = Wallet.objects.get(user=request.user)
-    if wallet.coins < cn:
-        cn = wallet.coins
-    request.session["coinss"] = cn
-    context = {
-        "cart": cart,
-        "addresses": address,
-        "cart_items": cart_items,
-        "total_price": total_price,
-        "numitems": numitems,
-        "dis": dis,
-        "subtotal": subtotal,
-        "payment": payment,
-        "coin_available": coin_available,
-        "cn": cn,
-    }
+            if cart.coupon is not None:
+                coup = get_object_or_404(Coupon, id=cart.coupon.id)
+                dis = coup.discount
+                print(dis)
+                total_price -= dis
+            numitems = cart_items.count()
+            client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
+            payment = client.order.create(
+                {"amount": total_price * 100, "currency": "INR", "payment_capture": 1}
+            )
+            print(payment)
+            coin = Wallet.objects.get(user=request.user)
+            coin_available = coin.coins
+            cn = (total_price // 100) * 30
+            wallet = Wallet.objects.get(user=request.user)
+            if wallet.coins < cn:
+                cn = wallet.coins
+            request.session["coinss"] = cn
+            context = {
+                "cart": cart,
+                "addresses": address,
+                "cart_items": cart_items,
+                "total_price": total_price,
+                "numitems": numitems,
+                "dis": dis,
+                "subtotal": subtotal,
+                "payment": payment,
+                "coin_available": coin_available,
+                "cn": cn,
+            }
     return render(request, "cartside/checkout.html", context)
 
 
 def coin_add(request):
     cn = request.session.get("coinss")
+    print(cn)
     cart = get_object_or_404(Cart, user=request.user)
     if cart.coin_discount > 0:
         cart.coin_discount = 0
@@ -305,24 +321,7 @@ def Usercancel(request,id):
     edit.save()
     return redirect('userorders')
 
-def wishlist(request):
-    user = request.user
-    wproducts = Wishlist.objects.filter(userr=user)
-    context = {"wproducts": wproducts}
-    return render(request, "cartside/wishlist.html", context)
 
-
-def Addwishlist(request, id):
-    user = request.user
-    product = Productsize.objects.get(id=id)
-    Wishlist.objects.create(userr=user, product=product)
-    return redirect("singproduct", id)
-
-
-def Deletewishlist(request, id):
-    d = Wishlist.objects.get(id=id)
-    d.delete()
-    return redirect("wishlist")
 
 def selectaddress(request):
     if request.method == "POST":
@@ -395,6 +394,7 @@ def create_orders(request):
 
     cart.items.all().delete()
     cart.coupon = None
+    cart.coin_discount = 0
     cart.save()
     return render(request, "cartside/thankyou.html")
 
@@ -470,6 +470,7 @@ def create_order(request):
 
     cart.items.all().delete()
     cart.coupon = None
+    cart.coin_discount = 0
     cart.save()
     return render(request, "cartside/thankyou.html")
 

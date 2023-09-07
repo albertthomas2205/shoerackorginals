@@ -1,6 +1,4 @@
 from django.db import models
-
-
 from django.db import models
 from user.models import CustomUser
 from adminside.models import Product,ProductImage,Productsize
@@ -15,6 +13,12 @@ class Coupon(models.Model):
     
     def __str__(self):
         return self.code
+
+class Usercoupon(models.Model):
+    user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
+    coupon = models.ForeignKey(Coupon,on_delete=models.CASCADE)
+    
+    
 
 class Userdetails(models.Model):
     userr = models.ForeignKey(CustomUser,on_delete = models.CASCADE)
@@ -124,7 +128,7 @@ class Wallet(models.Model):
 class Wallethistory(models.Model):
     wallet=models.ForeignKey(Wallet,on_delete=models.CASCADE)
     coins=models.IntegerField(default=0)
-    task=models.CharField(max_length=30)
+    task=models.CharField(max_length=100)
     created_at=models.DateField(auto_now_add=True)
     def __str__(self):
         return str(self.user)

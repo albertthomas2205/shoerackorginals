@@ -484,11 +484,15 @@ def adminorder_deatails(request, id):
     except:
         sub_price = order.total_price
     address = Userdetails.objects.get(id=order.address.id)
+    k = 150
+    total_price = order.total_price+k
+    print(total_price)
     context = {
         "order_items": order_items,
         "order": order,
         "sub_price": sub_price,
         "address": address,
+        'total_price':total_price
     }
     return render(request, "admin_panel/uniqueorder.html", context)
 

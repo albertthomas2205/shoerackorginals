@@ -25,7 +25,7 @@
 
     <div class="container">
       <div class="d-flex justify-content-between align-items-center py-3">
-        <h2 class="h5 mb-0"><a href="#" class="text-muted"></a> Order #16123222</h2>
+        <h2 class="h5 mb-0"><a href="#" class="text-muted"></a> Order #{{ order.order_id }}</h2>
       </div>
       <div class="row">
         <div class="col-lg-8">
@@ -37,7 +37,6 @@
                   
                 </div>
                 <div class="d-flex">
-                  <button class="btn btn-link p-0 me-3 d-none d-lg-block btn-icon-text"><i class="bi bi-download"></i> <span class="text">Invoice</span></button>
                   <div class="dropdown">
                     <button class="btn btn-link p-0 text-muted" type="button" data-bs-toggle="dropdown">
                       <i class="bi bi-three-dots-vertical"></i>
@@ -174,11 +173,23 @@
                   </tr>
                   <tr>
                     <td colspan="2">Discount (Code: {{order.coupon_applied.code}})</td>
+                    {% if order.coupon_applied.discount %}
                     <td class="text-danger text-end">-₹{{order.coupon_applied.discount}}</td>
+                    {% else %}
+                    <td class="text-danger text-end">- 0</td>
+                    {% endif %}
+                  </tr>
+                  <tr>
+                    <td colspan="2">Coin discount</td>
+                    {% if order.coupon_applied.discount %}
+                    <td class="text-end">-🪙{{order.coin_discount}}</td>
+                    {% else %}
+                    <td class="text-danger text-end">- 0</td>
+                    {% endif %}
                   </tr>
                   <tr class="fw-bold">
                     <td colspan="2">TOTAL</td>
-                    <td class="text-end">{{order.total_price}}</td>
+                    <td class="text-end">{{ order.total_price }}</td>
                   </tr>
                 </tfoot>
               </table>
@@ -191,7 +202,7 @@
                 <div class="col-lg-6">
                   <h3 class="h6">Payment Method</h3>
                   <p><br>
-                  Total: ₹{{order.total_price}} <span class="badge bg-success rounded-pill">{{order.payment_method}}</span></p>
+                  Total: ₹{{ order.total_price }} <span class="badge bg-success rounded-pill">{{order.payment_method}}</span></p>
                 </div>
                 <div class="col-lg-6">
                   <h3 class="h6">Billing address</h3>

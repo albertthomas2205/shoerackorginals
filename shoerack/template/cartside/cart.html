@@ -108,12 +108,16 @@
       
                         
                     <div class="flex-w flex-sb-m bor15 p-t-18 p-b-15 p-lr-40 p-lr-15-sm">
+
+                        
                         {% if messages %}
                   
                         {% for message in messages %}
                             {% if '2' in message.message %}
                                 <p class="error" style="color: red;">{{ message.message|cut:"(2)" }}</p>
                             {% else %}
+                            <p class="error" style="color: green;">{{ message.message|cut:"(3)" }}</p>
+                           
                             {% endif %}
                         {% endfor %}
                         
@@ -137,39 +141,8 @@
                             
                         
                         {% comment %} %%%%%%%%%%%5 {% endcomment %}
-                        
-                       {% comment %}  
-                        {% if messages %}
-                  
-                            {% for message in messages %}
-                                {% if '2' in message.message %}
-                                    <p class="error" style="color: red;">{{ message.message|cut:"(2)" }}</p>
-                                {% else %}
-                                {% endif %}
-                            {% endfor %}
-                            
-                            {% endif %}
-                                            
-                            {% if cart.coupon %}
-                            <p style="color: green;">Coupon applied <a id="remove-coupon-link" href="{% url 'removecoupon' %}" style="color: inherit; text-decoration: none;"><button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">×</button></a> </p>
-                            {% else %}
-                            <form method="post" action="{% url 'apply_coupon' %}">
-                                {% csrf_token %}
-                                
-                                
-                            <input placeholder="Apply coupon" aria-describedby="button-addon1" class="stext-104 cl2 plh4 size-117 bor13 p-lr-20 m-r-10 m-tb-5" type="text" name="code" id="coupon-code-input" >
-                                
-                            <div class="flex-c-m stext-101 cl2 size-118 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-5">
-                               <button type="submit" class="btn">Apply coupon </button>
-                            </div>
-                        </div>
-
                        
-                    </form>
-                    {% endif %}
-                
-
-                     {% endcomment %}
+                  
                 </div>
             </div>
         </div>
@@ -194,7 +167,7 @@
                       </div>
                         <div class="totals-item">
                           <label>Shipping</label>
-                          <div class="totals-value" id="cart-shipping">Free</div>
+                          <div class="totals-value" id="cart-shipping">150.00</div>
                         </div>
                         <div class="totals-item totals-item-total">
                           <label>Grand Total</label>
@@ -322,7 +295,7 @@ $(document).ready(function() {
   
 jQuery(document).ready(function() {
       var taxRate = 0.05;
-      var shippingRate = 15.00;
+      var shippingRate = 150.00;
       var fadeTime = 300;
       // var linePrice = price * quantity;
       /* Assign actions */

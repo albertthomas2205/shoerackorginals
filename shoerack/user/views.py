@@ -36,6 +36,7 @@ def register(request):
         phone_number = request.POST['phone_number']
         pass1 = request.POST['pass1']
         pass2 = request.POST['pass2']
+        referal = request.POST.get("referal")
         
         if pass1 == pass2 and len(pass1) > 4 and pass1 != name:
             
@@ -43,6 +44,20 @@ def register(request):
                 messages.error(request, "Email already exists")
                 return redirect('register')
             else:
+                try:
+                    print(referal)
+                    user = CustomUser.objects.get(email__icontains=referal)
+                    wallet = Wallet.objects.get(user=user)
+                    print("haiiii")
+                    Wallethistory.objects.create(wallet=wallet, task=f"For inviting {email}.", coins=500)
+                    wallet.coins += 500
+                    wallet.save()
+                    print("haiiii")
+                    print(f"Coins added to {wallet.user.email}'s wallet.")
+                except Wallet.DoesNotExist:
+                    print(f"No wallet found for referral email: {referal}")
+                except Exception as e:
+                    print(f"An error occurred: {str(e)}")
                 custom_user_manager = CustomUserManager()
                 custom_user_manager.send_otp_email(request,email)
                 myuser = CustomUser.objects.create_user(name=name, email=email,phone_number=phone_number,password = pass1)
@@ -266,6 +281,7 @@ def user_details(request):
 
     # Pass the user_details object to the HTML template
     return render(request, 'userside/profile.html', {'addresses': addresses})
+
 
 
 def add_address(request):

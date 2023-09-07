@@ -26,10 +26,6 @@ from django.template.defaultfilters import slugify
 
 
 
-class Usercoupon(models.Model):
-    user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
-    coupon = models.ForeignKey(Coupon,on_delete=models.CASCADE)
-    
     
 class Wishlist(models.Model):
     userr = models.ForeignKey(CustomUser, on_delete=models.CASCADE)

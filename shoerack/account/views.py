@@ -25,9 +25,16 @@ def profilehome(request):
         
             wallet=Wallet.objects.create(user=request.user)
             wallethistory=None
+    email = request.user.email
+    parts = email.split("@")
+    if len(parts) == 2:
+        code = parts[0]
+        print(f"Username: {code}")
+    else:
+        print("Invalid email address format")
         
   
-    return render(request,'profile/profilehome.html',{'addresses':addresses ,'wallet':wallet,'wallethistory':wallethistory})
+    return render(request,'profile/profilehome.html',{'addresses':addresses ,'wallet':wallet,'wallethistory':wallethistory,'code':code})
 # def edit_category(request, category_id):
 #     category = get_object_or_404(Category, id=category_id)
 
@@ -136,8 +143,10 @@ def order_deatails(request,id):
         sub_price = order.total_price + x
     except:
         sub_price = order.total_price
+    k = 150
+    total = order.total_price+k
     address=Userdetails.objects.get(id=order.address.id)
-    context={'order_items':order_items,'order':order,'sub_price':sub_price,'address':address}
+    context={'order_items':order_items,'order':order,'sub_price':sub_price,'address':address,'total':total}
     return render(request, 'profile/orderitems.html',context)
 
 
@@ -300,7 +309,8 @@ def generate_invoice(request,id):
         t = order.total_price
         c = order.coupon_applied.discount
         c = Decimal(c)
-        total = t + c
+        k = 150
+        total = t + c+ k
         print(total)
     else:
         total = order.total_price
@@ -315,20 +325,5 @@ def generate_invoice(request,id):
 
 
 
-
-# def GenerateInvoice(request,id):
-#     try:
-#         order=Order.objects.get(id=id)
-#         order_item=OrderItem.objects.get(order=order)
-#         # print(order_item)
-#         context={
-#             'order':order,
-#             'order_item':order_item,
-#             'now': datetime.now()
-
-#         }
-#         return render(request,'profile/invoice.html',context)
-#     except Order.DoesNotExist:
-#         return redirect('index')
 
         
