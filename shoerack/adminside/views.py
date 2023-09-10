@@ -97,6 +97,41 @@ def sales_report(request):
     return render(request, 'admin_panel/sales_report.html', context)
 
 
+def sales_yearly(request):
+    if request.method == 'POST':
+        from_date_str = request.POST.get('from')
+        to_date_str = request.POST.get('to')
+        from_date = datetime.strptime(from_date_str, "%m/%d/%Y").strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+        to_date = datetime.strptime(to_date_str, "%m/%d/%Y").strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+    else:
+        # If no specific date range is provided, set a default range for the past year
+        end_date = datetime.now(timezone.utc)
+        from_date = (end_date - timedelta(days=365)).strftime("%Y-%m-%d %H:%M:%S")
+        to_date = end_date.strftime("%Y-%m-%d %H:%M:%S")
+
+    # Filter orders created within the specified date range
+    order = Order.objects.filter(created_at__range=(from_date, to_date))
+    
+    items = []
+    
+    for ord in order:
+        item = OrderItem.objects.filter(order=ord)
+        
+        for ite in item:
+            items.append(ite)
+    
+    context = {
+        'order': order,
+        'items': items
+    }
+    
+    return render(request, 'admin_panel/sales_report.html', context)
+
+
 def sales_monthly(request):
     if request.method=='POST':
         from_date_str=request.POST.get('from')
@@ -320,6 +355,26 @@ def signout(request):
     logout(request)
     return redirect('signin')
 
+
+def deactivatecoupon(request, id):
+    coup = Coupon.objects.get(id=id)
+    if coup.active == True:
+        coup.active = False
+        coup.save()
+    else:
+        coup.active = True
+        coup.save()
+        
+    return redirect("admincoupon")
+def deletecoupon(request,id):
+    coup = Coupon.objects.get(id = id)
+    coup.delete()
+    
+    return redirect("admincoupon")
+    
+
+
+
 def category(request):
     if request.method == 'POST':
         categoryname = request.POST.get('category')
@@ -359,9 +414,10 @@ def addproduct(request):
         product = Product.objects.create(name=productname,category=category,brand = brand,color=color)
         
        
-        images = request.FILES.getlist('image')
+        images = request.FILES.getlist('images')
         for image in images:
                 ProductImage.objects.create(product=product, image=image)
+        print(images,brand)
         product.save()
         return redirect('product')
     category = Category.objects.all()
@@ -370,7 +426,10 @@ def addproduct(request):
     return render(request,'admin_panel/product.html',contex)
 
 
-def productsize(request,id):
+
+
+
+def productsizee(request,id):
     product= get_object_or_404(Product,id=id)
     var = Productsize.objects.filter(product = product)
     context = {'var':var}
@@ -382,7 +441,7 @@ def productsize(request,id):
         price = request.POST.get('price')
         productsize = Productsize.objects.create(product=product,description= description,size=size,stock=stock,price= price)
         productsize.save() 
-        return redirect('productsize',id) 
+        return redirect('productsizee',id) 
     
     return render(request,'admin_panel/productsize.html',context)
 
@@ -403,7 +462,7 @@ def editproductsize(request, id):
         product_size.price = price
         product_size.save()
         
-        return redirect('productsize', id=product_size.product.id)
+        return redirect('product')
     
     context = {'product_size': product_size}
     return render(request, 'admin_panel/varientedit.html', context)

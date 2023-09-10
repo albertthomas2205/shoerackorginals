@@ -14,11 +14,12 @@ urlpatterns = [
     path('product_list/', views.product_list, name='product_list'),
     path('category/addbrand',views.addbrand,name='addbrand'),
     path('product/addproduct',views.addproduct,name = 'addproduct'),
-    path('product/productsize/<int:id>',views.productsize,name = 'productsize'),
+    path('product/productsize/<int:id>',views.productsizee,name = 'productsizee'),
     path('edit_category/<int:category_id>/', views.edit_category, name='edit_category'),
     path('deletecategory/<int:category_id>/', views.delete_category, name='delete_category'),
     path('update_order_status/<int:id>/',views.update_order_status,name='update_order_status'),
     path('delete_product_size/<int:id>/', views.delete_product_size, name='delete_product_size'),
+    path('deactivatecoupon/<int:id>/', views.deactivatecoupon, name='deactivatecoupon'),
     path('editvarient/<int:id>/',views.editproductsize,name='editvarient'),
     path('deleteproduct/<int:id>/',views.delete_product,name='deleteproduct'),
     path('admincoupon/', views.Admincoupon, name='admincoupon'),
@@ -32,6 +33,7 @@ urlpatterns = [
     
 
     path('monthly/',views.sales_monthly,name='monthly'),
+    path('yearly/',views.sales_yearly,name='yearly'),
     path('daily/',views.sales_daily,name='daily'),
     path('sales_report/',views.sales_report,name='sales_report'),
     

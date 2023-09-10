@@ -305,6 +305,7 @@
                     <th>Valid till</th>
                     <th>activate</th>
                     <th>change status</th>
+                    <th>Delete</th>
                 </tr>
             </thead>
             <tbody>
@@ -324,6 +325,7 @@
                     <td>{{data.valid_to}}</td>
                         <td>{{data.active}}</a>
                     </td><td><a href="#deletesubcategoryModal" class="delete" data-toggle="modal" data-p-id="{{ data.id }}"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xe762;</i></a></td>
+      
                 </tr>{% endfor %}
                 
             </tbody>

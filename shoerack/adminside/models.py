@@ -1,5 +1,9 @@
 from django.db import models
 from PIL import Image
+from io import BytesIO
+from django.core.files.base import ContentFile
+
+
 
 # Create your models here.
 
@@ -29,20 +33,6 @@ class Product(models.Model):
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='product_images/')
-    
-    # def save (self, *args, **kwargs):
-    #     super().save(*args,**kwargs)
-    #     img = Image.open(self.image.path)
-        
-    #     if img.height>300 or img.weight>300:
-    #         output_size = (300,300)
-    #         img.thumbnail(output_size)
-    #         img.save(self.image)
-            
-            
-    
-    
-
     def __str__(self):
         return f"Image of {self.product.name}"
 class Productsize(models.Model):

@@ -84,19 +84,40 @@
                 </div>
                
             </form>
-           
+            
+          
         </div>
+      
     </header>
 
      
    
       <div class="table-responsive">
+       
         <button class="btn btn-primary" id="pdfButton"  style="float: right; margin: 5px;">
           PDF &nbsp<i class="far fa-file text-light"></i>
         </button>
         <button class="btn btn-primary" onclick="exportToExcel()" style="float: right; margin: 5px;">
           Excel &nbsp<i class="far fa-file-pdf text-light"></i>
         </button>
+        
+          <a href="{% url 'yearly' %}">
+            <button class="btn btn-success" style="float: right; margin: 5px;">
+              Yearly<i class="far fa-file text-light"></i>
+            </button>
+          </a>
+        
+        <a href="{% url 'monthly' %}">
+          <button class="btn btn-success"   style="float: right; margin: 5px;">
+            Monthly<i class="far fa-file text-light"></i>
+          </button>
+        </a>
+      <a href="{% url 'sales_report' %}">
+      <button class="btn btn-success"   style="float: right; margin: 5px;">
+        Weekly<i class="far fa-file text-light"></i>
+      </button>
+    </a>
+      
         <table class="table text-nowrap mb-0 align-middle">
           <thead class="text-dark fs-4">
             <tr>

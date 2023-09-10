@@ -57,9 +57,8 @@
 
                             <tr class="table_head">
                                 <th class="column-1">Product</th>
-                                <th class="column-1"></th>
                                 <th class="column-1">Price</th>
-                               
+                                <th class="column-1">Size</th>
                                 <th class="column-1">Quantity</th>
                                 <th class="column-1">Total</th>
                                 
@@ -73,18 +72,20 @@
                                 <td class="column-1">
                                     <div class="how-itemcart1">
                                         <img src="{{ item.product.product.images.first.image.url }}" alt="IMG">
+                                     
                                         
                                     </div>
+                                    {{ item.product.product.name }}
                                 </td>
                          
                                 
-                                <td class=" column-1"> {{ item.product.product.name }} </td>
-                                <td class="product-price column-1 ">{{ item.product.price }}</td>
+                                <td class=" product-price column-1"> {{ item.product.price }} </td>
+                                <td class=" column-1 ">{{item.product.size}} </td>
                                 <td class="column-1">
                                     <div class="wrap-num-product flex-w m-l-auto m-r-0" style="width: 50px; height: 40px; display: inline-block; border: 1px solid #ccc; border-radius: 4px; background-color: #f7f7f7;">
 
                                         <div class="product-quantity" style="display: flex; align-items: center; padding: 0 8px;">
-                                            <input type="number" name="quant" data-product-id="{{item.product.id}}" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" class="text-center quantity-input" style="width: 40px; height: 30px; padding: 0 8px; font-size: 14px; text-align: center; border: none; background-color: transparent; color: #333; outline: none;">
+                                            <input type="number" name="quant" data-product-id="{{item.product.id}}" value="{{ item.quantity }}" id="quantityInput" min="1" max="{{ item.product.stock }}" class="text-center quantity-input" style="width: 40px; height: 30px; padding: 0 8px; font-size: 14px; text-align: center; border: none; background-color: transparent; color: #333; outline: none;">
                                         </div>
                                         <div id="alert-message" style="display: none; color: red;">Maximum stock exceeded!</div>
                                         
@@ -226,6 +227,21 @@
 {% endblock %} 
 {% block sample  %}
 
+<script>
+    // Get the input element by its ID
+    var quantityInput = document.getElementById('quantityInput');
+  
+    // Add an event listener to listen for changes in the input value
+    quantityInput.addEventListener('change', function() {
+      var quantity = parseInt(quantityInput.value); // Parse the input value as an integer
+      var productStock = parseInt(quantityInput.getAttribute('max')); // Parse the max attribute as an integer
+  
+      // Check if quantity is equal to product stock
+      if (quantity === productStock) {
+        alert(' product  out of stock!');
+      }
+    });
+  </script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {

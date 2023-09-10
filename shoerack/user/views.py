@@ -152,6 +152,7 @@ def singproduct(request, id):
    
     context = {
             "data": data,
+            "product":product,
             "k": k,
             "psize": psize,
             'products':relatedproducts

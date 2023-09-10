@@ -3,7 +3,7 @@ from django.shortcuts import render,redirect,get_object_or_404
 # Create your views here.
 from account.models import Cart, CartItem,Coupon
 from adminside.models import Product,Productsize,ProductImage
-# from cart.models import Usercoupon,Wishlist
+from adminside.forms import UserdetailsForm
 from django.contrib.auth.decorators import login_required
 from user.models import CustomUser
 from account.models import Userdetails,Wallet,Wallethistory,Usercoupon
@@ -136,7 +136,7 @@ def apply_coupon(request):
             print(k)
             if Usercoupon.objects.filter(Q(coupon=coup) & Q(user=request.user)).exists():
                 key = "2"
-                messages.error(request, f"coupon alredy . ({key})")
+                messages.error(request, f"coupon alredy applied . ({key})")
                 return redirect("cart")
                 
                 
@@ -182,58 +182,123 @@ def checkout(request):
     cart_items = CartItem.objects.filter(cart=cart)
     k = 150
     coins = cart.coin_discount
+    numitems = cart_items.count()
   
     total_price = (
         int(sum((item.product.price * item.quantity for item in cart_items))) + k
     )
     try:
+        if cart.coupon:
+            
+            b = cart.coupon.minimumamount
+            print(b,total_price)
+            if b>total_price:
+                    cart = get_object_or_404(Cart, user=request.user)
+                    usercoupon = Usercoupon.objects.get(Q(coupon=cart.coupon) & Q(user=request.user))
+                    usercoupon.delete()
+                    cart.coupon = None
+                    cart.save()
+                    return redirect("cart")
+    
         
-        b = cart.coupon.minimumamount
-        print(b,total_price)
-        if b>total_price:
-            cart = get_object_or_404(Cart, user=request.user)
-            usercoupon = Usercoupon.objects.get(Q(coupon=cart.coupon) & Q(user=request.user))
-            usercoupon.delete()
-            cart.coupon = None
-            cart.save()
-            return redirect("cart")
-    except:
-            subtotal = total_price-k
-            total_price -= coins
-            dis = 0
+            
+    finally:  
+        subtotal = total_price-k
+        total_price -= coins
+        dis = 0
 
-            if cart.coupon is not None:
-                coup = get_object_or_404(Coupon, id=cart.coupon.id)
-                dis = coup.discount
-                print(dis)
-                total_price -= dis
-            numitems = cart_items.count()
-            client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
-            payment = client.order.create(
-                {"amount": total_price * 100, "currency": "INR", "payment_capture": 1}
-            )
-            print(payment)
-            coin = Wallet.objects.get(user=request.user)
-            coin_available = coin.coins
-            cn = (total_price // 100) * 30
-            wallet = Wallet.objects.get(user=request.user)
-            if wallet.coins < cn:
-                cn = wallet.coins
-            request.session["coinss"] = cn
-            context = {
-                "cart": cart,
-                "addresses": address,
-                "cart_items": cart_items,
-                "total_price": total_price,
-                "numitems": numitems,
-                "dis": dis,
-                "subtotal": subtotal,
-                "payment": payment,
-                "coin_available": coin_available,
-                "cn": cn,
-            }
+        if cart.coupon is not None:
+            coup = get_object_or_404(Coupon, id=cart.coupon.id)
+            dis = coup.discount
+            print(dis)
+            total_price -= dis
+        numitems = cart_items.count()
+        client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
+        payment = client.order.create(
+            {"amount": total_price * 100, "currency": "INR", "payment_capture": 1}
+        )
+        print(payment)
+        coin = Wallet.objects.get(user=request.user)
+        coin_available = coin.coins
+        cn = (total_price // 100) * 30
+        wallet = Wallet.objects.get(user=request.user)
+        if wallet.coins < cn:
+            cn = wallet.coins
+        request.session["coinss"] = cn
+        context = {
+            "cart": cart,
+            "addresses": address,
+            "cart_items": cart_items,
+            "total_price": total_price,
+            "numitems": numitems,
+            "dis": dis,
+            "subtotal": subtotal,
+            "payment": payment,
+            "coin_available": coin_available,
+            "cn": cn,
+        }
+    
+
+    return render(request, "cartside/checkout.html", context)
+def checkouttt(request):
+    address = Userdetails.objects.filter(userr=request.user).order_by("-created_at")
+    cart = get_object_or_404(Cart, user=request.user)
+    cart_items = CartItem.objects.filter(cart=cart)
+    k = 150
+    coins = cart.coin_discount
+    total_price = (
+        int(sum((item.product.price * item.quantity for item in cart_items))) + k
+    )
+
+    subtotal = total_price
+    subtotal = total_price-k
+    total_price -= coins
+    dis = 0
+    if cart.coupon is not None:
+        coup = get_object_or_404(Coupon, id=cart.coupon.id)
+        dis = coup.discount
+        total_price -= dis
+    numitems = cart_items.count()
+    client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
+    payment = client.order.create(
+        {"amount": total_price * 100, "currency": "INR", "payment_capture": 1}
+    )
+    print(payment)
+    coin = Wallet.objects.get(user=request.user)
+    coin_available = coin.coins
+    cn = (total_price // 100) * 30
+    wallet = Wallet.objects.get(user=request.user)
+    if wallet.coins < cn:
+        cn = wallet.coins
+    request.session["coinss"] = cn
+    context = {
+        "cart": cart,
+        "addresses": address,
+        "cart_items": cart_items,
+        "total_price": total_price,
+        "numitems": numitems,
+        "dis": dis,
+        "subtotal": subtotal,
+        "payment": payment,
+        "coin_available": coin_available,
+        "cn": cn,
+    }
     return render(request, "cartside/checkout.html", context)
 
+
+def editaddr(request, userdetails_id):
+    userdetails = get_object_or_404(Userdetails, id=userdetails_id)
+
+    if request.method == 'POST':
+        form = UserdetailsForm(request.POST, instance=userdetails)
+        if form.is_valid():
+            form.save()
+            return redirect('checkout')  # Replace with the URL name for success
+    else:
+        form = UserdetailsForm(instance=userdetails)
+
+    context = {'form': form}
+    return render(request, 'profile/editaddress.html', context)
 
 def coin_add(request):
     cn = request.session.get("coinss")

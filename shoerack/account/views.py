@@ -10,9 +10,10 @@ from account.models import Order,OrderItem,OrderReturn
 from django.contrib.auth import authenticate
 from decimal import Decimal
 from datetime import datetime
+from django.contrib.auth.decorators import login_required
 
     
-
+@login_required(login_url='loginn')
 def profilehome(request):
     addresses= request.user
   
@@ -35,19 +36,7 @@ def profilehome(request):
         
   
     return render(request,'profile/profilehome.html',{'addresses':addresses ,'wallet':wallet,'wallethistory':wallethistory,'code':code})
-# def edit_category(request, category_id):
-#     category = get_object_or_404(Category, id=category_id)
 
-#     if request.method == 'POST':
-#         # Process the form data submitted for editing
-#         category_name = request.POST['category_name']
-#         # Update the category object
-#         category.category_name = category_name
-#         category.save()
-#         return redirect('category')  # Replace 'category_list' with the URL name of the page displaying the category list
-
-#     # Render the template for editing the category
-#     return render(request, 'admin_panel/category.html', {'category': category})
 
 
 def edit_profile(request,id):
@@ -230,7 +219,11 @@ def resetpassword (request):
         up = request.POST.get('password')
         hased = make_password(up)
         k = get_object_or_404(CustomUser,email=request.user.email)
+        print(k.password)
+        print(k.password)
         h = authenticate(request,email=k.email,password=up)
+        print(h)
+        print('haiii')
         if k.password == hased:
             print('bibin')
        
@@ -279,7 +272,7 @@ def product_return(request,id):
         total_price= orderitem.total_itemprice - fi + k
         print(total_price)
     except:
-        k = 15
+        k = 150
         total_price =orderitem.total_itemprice + k
     finally:
         OrderReturn.objects.create(orderitem=orderitem,user=request.user,total_price=total_price)
@@ -292,7 +285,7 @@ def render_to_pdf(template_path, context_dict):
     template = get_template(template_path)
     html = template.render(context_dict)
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'filename="tails invoice.pdf"'
+    response['Content-Disposition'] = 'filename="shoerack invoice.pdf"'
 
     pisa_status = pisa.CreatePDF(
         html, dest=response
