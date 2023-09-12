@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'user','cart',
-    "debug_toolbar",
     'account',
     'rest_framework',
    
@@ -57,7 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
+   
 ]
 
 ROOT_URLCONF = 'shoerack.urls'
@@ -179,11 +178,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'user.CustomUser'
 
 
-INTERNAL_IPS = [
-    # ...
-    "127.0.0.1",
-    # ...
-]
+# INTERNAL_IPS = [
+#     # ...
+#     "127.0.0.1",
+#     # ...
+# ]
 
-KEY = 'rzp_test_lCPwFk1fVNkzxq'
-SECRET = 'XIM7YrvSXKWouboilyqQ5bGh'
+# KEY = 'rzp_test_lCPwFk1fVNkzxq'
+# SECRET = 'XIM7YrvSXKWouboilyqQ5bGh'
