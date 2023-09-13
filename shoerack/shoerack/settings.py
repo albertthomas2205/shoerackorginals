@@ -114,7 +114,7 @@ DATABASES = {
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')
+    os.path.join(BASE_DIR, 'assets/')
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, "assets/")
@@ -178,11 +178,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'user.CustomUser'
 
 
-# INTERNAL_IPS = [
-#     # ...
-#     "127.0.0.1",
-#     # ...
-# ]
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]
 
-# KEY = 'rzp_test_lCPwFk1fVNkzxq'
-# SECRET = 'XIM7YrvSXKWouboilyqQ5bGh'
+KEY = 'rzp_test_lCPwFk1fVNkzxq'
+SECRET = 'XIM7YrvSXKWouboilyqQ5bGh'
