@@ -35,7 +35,9 @@ urlpatterns = [
     path('monthly/',views.sales_monthly,name='monthly'),
     path('yearly/',views.sales_yearly,name='yearly'),
     path('daily/',views.sales_daily,name='daily'),
+    path('daily_sales/',views.daily_sales,name='dailysales'),
     path('sales_report/',views.sales_report,name='sales_report'),
+    
     
     
     path('orderchartsdaily/', views.sales_chart_daily, name='orderchartsdaily'),

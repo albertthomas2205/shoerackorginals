@@ -132,10 +132,12 @@ def order_deatails(request,id):
         sub_price = order.total_price + x
     except:
         sub_price = order.total_price
+    sub = order.total_price
     k = 150
-    total = order.total_price+k
+    sub -= 150
+    total = order.total_price
     address=Userdetails.objects.get(id=order.address.id)
-    context={'order_items':order_items,'order':order,'sub_price':sub_price,'address':address,'total':total}
+    context={'order_items':order_items,'order':order,'sub_price':sub_price,'address':address,'total':total,'sub':sub }
     return render(request, 'profile/orderitems.html',context)
 
 
@@ -307,7 +309,8 @@ def generate_invoice(request,id):
         print(total)
     else:
         total = order.total_price
-    context = {'order':order,'orderitems':orderitems ,'total':total}
+   
+    context = {'order':order,'orderitems':orderitems ,'total':total , }
     pdf = render_to_pdf('profile/invoice.html', context)
 
     # Set content type and headers for download

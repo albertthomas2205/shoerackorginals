@@ -155,7 +155,7 @@ def singproduct(request, id):
             "product":product,
             "k": k,
             "psize": psize,
-            'products':relatedproducts
+            'relatedproducts':relatedproducts
         }
         
     return render(request, "userside/singleproduct.html", context)

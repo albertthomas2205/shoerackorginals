@@ -25,7 +25,10 @@ import json
 from django.db.models import Sum
 from django.db.models.functions import TruncDate, TruncYear, TruncWeek
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 
+
+@login_required(login_url='signin') 
 def AdminDashboard(request):
     if request.method=='POST':
         from_date_str=request.POST.get('from')
@@ -66,6 +69,7 @@ def AdminDashboard(request):
     
     return render(request, "admin_panel/index.html",context)
 
+@login_required(login_url='signin') 
 def sales_report(request):
     if request.method=='POST':
         from_date_str=request.POST.get('from')
@@ -163,8 +167,42 @@ def sales_monthly(request):
     return render(request, 'admin_panel/sales_report.html', context)
 
 
+
 from datetime import datetime
 
+def daily_sales(request):
+    if request.method == 'POST':
+        from_date_str = request.POST.get('from')
+        to_date_str = request.POST.get('to')
+        
+        # Convert date strings to datetime objects
+        from_date = datetime.strptime(from_date_str, "%m/%d/%Y")
+        to_date = datetime.strptime(to_date_str, "%m/%d/%Y")
+        
+        # Set end_date to the end of the selected day
+        end_date = to_date + timedelta(days=1, seconds=-1)
+        
+        # Query orders within the selected date range
+        order = Order.objects.filter(created_at__range=(from_date, end_date))
+    else:
+        # If no date range is specified, show orders from the last day
+        end_date = datetime.now(timezone.utc)
+        start_date = end_date - timedelta(days=1)
+        order = Order.objects.filter(created_at__range=(start_date, end_date))
+    
+    items = []
+    
+    for ord in order:
+        item = OrderItem.objects.filter(order=ord)
+        for ite in item:
+            items.append(ite)
+    
+    context = {
+        'order': order,
+        'items': items
+    }
+    
+    return render(request, 'admin_panel/sales_report.html', context)
 
 def sales_daily(request):
     if request.method == 'POST':
@@ -260,12 +298,13 @@ def sales_chart_monthly(request):
 
 
 
+
 def signinn(request):
     return render(request,'account/signin.html')
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-
+@login_required(login_url='signin') 
 def user(request):
     data = CustomUser.objects.all()
     
@@ -304,7 +343,8 @@ def signin(request):
             messages.error(request, "Invalid credentials")
     return render(request,'admin_panel/signin.html')
 
-    
+      
+@login_required(login_url='signin')  
 def adminhome(request):
     
     return render(request,'admin_panel/index.html')
@@ -329,7 +369,7 @@ def block_user_view(request,id):
 
 
 
-
+@login_required(login_url='signin') 
 def product(request):
     products = Product.objects.all()
     category = Category.objects.all()
@@ -375,6 +415,7 @@ def deletecoupon(request,id):
 
 
 
+@login_required(login_url='signin') 
 def category(request):
     if request.method == 'POST':
         categoryname = request.POST.get('category')
@@ -392,6 +433,7 @@ def category(request):
     
     return render(request,'admin_panel/category.html',{'categories':categories,'brand':brand})
 
+@login_required(login_url='signin') 
 def addbrand(request):
     if request.method == 'POST':
         brandname = request.POST.get('brandname')
@@ -429,6 +471,7 @@ def addproduct(request):
 
 
 
+@login_required(login_url='signin') 
 def productsizee(request,id):
     product= get_object_or_404(Product,id=id)
     var = Productsize.objects.filter(product = product)
@@ -446,6 +489,7 @@ def productsizee(request,id):
     return render(request,'admin_panel/productsize.html',context)
 
 
+@login_required(login_url='signin') 
 def editproductsize(request, id):
     product_size = get_object_or_404(Productsize, id=id)
     
@@ -523,7 +567,8 @@ def delete_product (request, id):
             
         product.delete()
         return redirect('product')
-    
+ 
+@login_required(login_url='signin')   
 def Orders(request):
     orders = Order.objects.all().order_by("-created_at")
     paginator = Paginator(orders, per_page=3)
@@ -544,6 +589,7 @@ def adminorder_deatails(request, id):
         sub_price = order.total_price
     address = Userdetails.objects.get(id=order.address.id)
     k = 150
+    sub_price -=k
     total_price = order.total_price+k
     print(total_price)
     context = {
