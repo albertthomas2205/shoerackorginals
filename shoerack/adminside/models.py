@@ -35,6 +35,7 @@ class ProductImage(models.Model):
     image = models.ImageField(upload_to='product_images/')
     def __str__(self):
         return f"Image of {self.product.name}"
+    
 class Productsize(models.Model):
     product = models.ForeignKey(Product,related_name='productsize',on_delete=models.CASCADE)
     size = models.IntegerField()
